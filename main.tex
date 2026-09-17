@@ -421,7 +421,70 @@ Remove the selected non-ignition cells from $G_s$ and let $R_s(y)$ be the cells 
 
 Proposition~\ref{prop:recourse} shows that the binary restrictions on $x$ can be relaxed without changing the optimal value. The model also has relatively complete recourse, so its Benders reformulation requires only optimality cuts.
 
-\subsection{Computational experiments}
+\section{Graph-based lower-bound inequalities}\label{sec:llbi}
+
+This section introduces valid inequalities that strengthen the scenario recourse approximations used in a Branch-and-Benders-cut framework. The decomposition framework provides the solution method in which the inequalities are applied. The contribution of this paper concerns the lower-bound inequalities and their graph-based constructions.
+
+\subsection{Branch-and-Benders framework}
+
+The master problem contains the firebreak variables $y$ and a continuous variable $\theta_s$ that estimates the recourse loss of each scenario $s\in\mathcal{S}$. The risk aggregation remains in the master. Using the formulation from Section~\ref{s:general-model}, the master can be written as
+\begin{subequations}\label{model:benders-master}
+\begin{align}
+\min_{y,\theta,\varphi,z}\quad
+    &(1-\lambda)\sum_{s\in\mathcal{S}}\rho_s\theta_s
+    +\lambda\left(
+    \varphi+\frac{1}{1-\beta}
+    \sum_{s\in\mathcal{S}}\rho_sz_s
+    \right)
+    \label{model:benders-master-objective}\\
+\text{s.t.}\quad
+    &y\in\mathcal{Y},
+    \label{model:benders-master-budget}\\
+    &z_s\geq\theta_s-\varphi,
+    &&s\in\mathcal{S},
+    \label{model:benders-master-excess}\\
+    &z_s\geq0,
+    &&s\in\mathcal{S},
+    \label{model:benders-master-excess-domain}\\
+    &\varphi\geq0,
+    \label{model:benders-master-threshold}\\
+    &\theta_s\geq Q_s(y),
+    &&s\in\mathcal{S}.
+    \label{model:benders-master-recourse}
+\end{align}
+\end{subequations}
+
+The variables $\theta_s$ represent scenario losses before multiplication by $\rho_s$. Hence, scenario probabilities appear only in the objective. The recourse constraints~\eqref{model:benders-master-recourse} are enforced through Benders optimality cuts obtained from the linear recourse problems~\eqref{model:scenario-recourse}. In the callback implementation, these cuts are added at integer candidate solutions. Optional LP-based user cuts can also be generated at the root relaxation.
+
+The inequalities developed below provide initial or dynamically separated lower bounds on the same variables $\theta_s$. They do not replace the Benders optimality cuts required for exactness.
+
+\subsection{Standard lifted lower-bound inequality}
+
+Consider a scenario $s$ without firebreaks. Let $\mathcal{B}_s^0=\mathcal{B}_s(0)$ be its burned cells and let $q_s^0=Q_s(0)=\sum_{k\in\mathcal{B}_s^0}w_k$ be its untreated loss. For each eligible non-ignition cell $i\in C\cap(\mathcal{B}_s^0\setminus\{r_s\})$, define the closed downstream set
+\[
+    D_s(i)=\left\{k\in\mathcal{B}_s^0:
+    \text{there is a directed path from $i$ to $k$ in $G_s$}\right\}.
+\]
+The set includes $i$. Its weighted mass is $d_{si}=\sum_{k\in D_s(i)}w_k$. For eligible cells outside $\mathcal{B}_s^0$ and for the ignition, set $d_{si}=0$.
+
+The standard lifted lower-bound inequality (LLBI) is
+\begin{equation}
+    \theta_s\geq q_s^0-\sum_{i\in C}d_{si}y_i,
+    \qquad s\in\mathcal{S}.
+    \label{ineq:standard-llbi}
+\end{equation}
+
+\begin{proposition}\label{prop:standard-llbi}
+Inequality~\eqref{ineq:standard-llbi} is valid for every $y\in\mathcal{Y}$.
+\end{proposition}
+
+\begin{proof}
+Let $\mathcal{P}_s(y)=\mathcal{B}_s^0\setminus\mathcal{B}_s(y)$ be the cells protected by $y$. Every cell in $\mathcal{P}_s(y)$ is downstream of at least one selected non-ignition cell. Therefore, $\mathcal{P}_s(y)\subseteq\bigcup_{i:y_i=1}D_s(i)$. Since the weights are nonnegative, the protected loss is at most $\sum_{i\in C}d_{si}y_i$. Subtracting this upper bound from $q_s^0$ gives~\eqref{ineq:standard-llbi}.
+\end{proof}
+
+On a propagation tree, $d_{si}$ equals the loss avoided by selecting $i$ alone. On a graph with alternative paths, it is an optimistic bound because some downstream cells may still be reached through a path that avoids $i$. The inequality remains valid, but its coefficients may count the same potential protection several times when several firebreaks are selected. CoverageLLBI and PathLLBI address this limitation using cell-level graph information.
+
+\section{Computational experiments}\label{sec:computational-experiments}
 %\textcolor{red}{In this study, we use real landscapes for our experiments, namely \texttt{Sub100}, situated in the Alberta region of Canada. \texttt{Sub20} represents a forest patch covering an area of 400 hectares (depicted in Fig.\:\ref{fig:graphs}), this region is a partition of \texttt{Sub100} that is employed for the assessment of the optimization model. Additionally, for our computational experiments, \texttt{Sub100} is further subdivided into \texttt{Sub40}. The landscape is divided into $100 \times 100$ m$^2$ cells, and their detailed landscape information can be found at \url{https://github.com/fire2a/C2FFBP}. We use Cell2Fire to conduct simulations of multiple wildfires, which requires fire-weather scenarios (FWS) specific to the study area \citep{parisien2005mapping, pais2021cell2fire}. These scenarios encompass crucial factors such as temperature, relative humidity, wind speed, wind direction, and fire weather indices, which are necessary inputs to the FBP system \citep{hirsch1996canadian} (see, e.g., Fig.\:\ref{fig:graphs_landscape}-\textbf{B}). To ensure the representation of extreme conditions, we exclusively considered scenarios that exceeded the 95th percentile mean temperature.}
 
 We employed three real landscapes in our experiments: \texttt{Sub20}, \texttt{Sub40}, and \texttt{Sub100}, all situated in the Alberta region of Canada. The \texttt{Sub20} landscape, a 400-hectare forest patch depicted in Fig.\:\ref{fig:graphs_landscape}, was chosen for assessing computational performance and observing how the objective function evolves with changes in model parameters. To evaluate the model's computational efficacy over larger forest areas, we extended the study to include \texttt{Sub40} (Fig.:\ref{fig:Sub40}) and \texttt{Sub100} (Fig.:\ref{fig:Sub100}) under specific parameter configurations. Each landscape is divided into $100 \times 100$ m$^2$ cells, and detailed information about these landscapes can be found at \url{https://github.com/fire2a/C2FFBP}. Simulations of multiple wildfires were conducted using Cell2Fire, requiring fire-weather scenarios (FWS) specific to the study area \citep{parisien2005mapping, pais2021cell2fire}. These scenarios include crucial factors such as temperature, relative humidity, wind speed, wind direction, and fire weather indices—essential inputs for the Canadian Fire Behavior Prediction (FBP) System \citep{hirsch1996canadian} (see, e.g., Fig.\:\ref{fig:graphs_landscape}-\textbf{B}).
