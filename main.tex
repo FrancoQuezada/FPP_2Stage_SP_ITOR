@@ -188,7 +188,7 @@ Wildfire uncertainty concerns both the ignition cell and the subsequent fire spr
 
 Cell2Fire records the propagation of scenario $s$ as a directed Reburn graph $G_s^R=(V_s,E_s^R)$. The set $V_s\subseteq V$ contains the cells reached by the simulated fire, and an arc $(i,j)\in E_s^R$ indicates propagation from cell $i$ to cell $j$ \citep{pais2021downstream}. A cell may have several predecessors in this graph, representing alternative propagation directions.
 
-For optimization, we extract a shortest-path tree $G_s^T=(V_s,E_s^T)$ rooted at $r_s$. All arcs have unit length, and ties between shortest-path predecessors are broken by cell index. The tree and Reburn graph contain the same cells and ignition, while $E_s^T\subseteq E_s^R$. Thus, the tree preserves the cells reached in the simulation but retains one propagation path from the ignition to each cell. We solve the FPP on the tree scenarios and subsequently evaluate the resulting placements on their paired Reburn graphs.
+For optimization, we extract a shortest-path tree $G_s^T=(V_s,E_s^T)$ rooted at $r_s$. All arcs have unit length, and ties between shortest-path predecessors are broken by cell index. The tree and Reburn graph contain the same cells and ignition, while $E_s^T\subseteq E_s^R$. Thus, the tree preserves the cells reached in the simulation but retains one propagation path from the ignition to each cell. We solve the FPP on the tree scenarios and subsequently evaluate the resulting placements on their paired Reburn graphs. For instances that remain tractable, we also solve the FPP directly on the Reburn graphs for comparison.
 
 Cell2Fire uses the Canadian Forest Fire Behaviour Prediction System to simulate fire spread from landscape and weather data \citep{hirsch1996canadian}. Figure~\ref{fig:graphs_landscape} shows the \texttt{Sub20} landscape, a simulated fire, its ignition, and the corresponding weather conditions.
 
@@ -354,7 +354,7 @@ where $( \bullet )^+ = \max(\bullet, 0)$. This reformulation is widely used to r
 
 \section{FPP as a two-stage stochastic programming model}\label{s:general-model}
 
-The first-stage decision selects a firebreak placement $y\in\mathcal{Y}$ before the fire scenario is known. In the second stage, the burned cells and the corresponding loss are determined for each scenario. The formulation below applies to a generic propagation graph $G_s=(V_s,E_s)$. In the computational experiments, $G_s$ is the shortest-path tree $G_s^T$ defined in Section~\ref{sec2}.
+The first-stage decision selects a firebreak placement $y\in\mathcal{Y}$ before the fire scenario is known. In the second stage, the burned cells and the corresponding loss are determined for each scenario. The formulation below applies to a generic propagation graph $G_s=(V_s,E_s)$. The main computational experiments use the shortest-path tree $G_s^T$ defined in Section~\ref{sec2}; selected comparisons use the paired Reburn graph $G_s^R$.
 
 For each $s\in\mathcal{S}$ and $k\in V_s$, let $x_{sk}$ equal one if cell $k$ burns in scenario $s$ and zero otherwise. To state the propagation constraints compactly, define $\bar y_{sk}=y_k$ if $k\in C\setminus\{r_s\}$ and $\bar y_{sk}=0$ otherwise. Thus, a selected cell blocks incoming propagation unless it is the ignition.
 
@@ -679,17 +679,128 @@ is stated for an individual scenario loss, it remains valid under the
 expected-loss, CVaR, and mean--CVaR objectives.
 
 \section{Computational experiments}\label{sec:computational-experiments}
-%\textcolor{red}{In this study, we use real landscapes for our experiments, namely \texttt{Sub100}, situated in the Alberta region of Canada. \texttt{Sub20} represents a forest patch covering an area of 400 hectares (depicted in Fig.\:\ref{fig:graphs}), this region is a partition of \texttt{Sub100} that is employed for the assessment of the optimization model. Additionally, for our computational experiments, \texttt{Sub100} is further subdivided into \texttt{Sub40}. The landscape is divided into $100 \times 100$ m$^2$ cells, and their detailed landscape information can be found at \url{https://github.com/fire2a/C2FFBP}. We use Cell2Fire to conduct simulations of multiple wildfires, which requires fire-weather scenarios (FWS) specific to the study area \citep{parisien2005mapping, pais2021cell2fire}. These scenarios encompass crucial factors such as temperature, relative humidity, wind speed, wind direction, and fire weather indices, which are necessary inputs to the FBP system \citep{hirsch1996canadian} (see, e.g., Fig.\:\ref{fig:graphs_landscape}-\textbf{B}). To ensure the representation of extreme conditions, we exclusively considered scenarios that exceeded the 95th percentile mean temperature.}
 
-We employed three real landscapes in our experiments: \texttt{Sub20}, \texttt{Sub40}, and \texttt{Sub100}, all situated in the Alberta region of Canada. The \texttt{Sub20} landscape, a 400-hectare forest patch depicted in Fig.\:\ref{fig:graphs_landscape}, was chosen for assessing computational performance and observing how the objective function evolves with changes in model parameters. To evaluate the model's computational efficacy over larger forest areas, we extended the study to include \texttt{Sub40} (Fig.:\ref{fig:Sub40}) and \texttt{Sub100} (Fig.:\ref{fig:Sub100}) under specific parameter configurations. Each landscape is divided into $100 \times 100$ m$^2$ cells, and detailed information about these landscapes can be found at \url{https://github.com/fire2a/C2FFBP}. Simulations of multiple wildfires were conducted using Cell2Fire, requiring fire-weather scenarios (FWS) specific to the study area \citep{parisien2005mapping, pais2021cell2fire}. These scenarios include crucial factors such as temperature, relative humidity, wind speed, wind direction, and fire weather indices—essential inputs for the Canadian Fire Behavior Prediction (FBP) System \citep{hirsch1996canadian} (see, e.g., Fig.\:\ref{fig:graphs_landscape}-\textbf{B}).
+This section describes the instances, compared methods, and evaluation
+protocol. We distinguish optimization on the shortest-path trees, evaluation
+on the paired Reburn graphs, and evaluation on scenarios not used for
+optimization.
 
-The construction of fire-weather scenarios involved historical data obtained from the Climate Information Section of the Agriculture and Forestry website of Alberta, as well as data from the Yaha Tinda Auto station (coordinates: 51.6547°, -115.3617°). This station was selected for its proximity to the coordinates of the forests used in the simulation. To ensure representation of extreme conditions, we exclusively considered scenarios exceeding the 95th percentile mean temperature.
+\subsection{Instances and scenario sets}
 
-The computational experiments conducted on the \texttt{Sub20} forest were considered to analyze the performance of the mathematical model, the number of scenarios $|\Omega|$, the firebreak intensity $\alpha$, and the parameter $\lambda$. The values chosen for the number of scenarios were $|\Omega| \in \{ 20, 60, 100, 140, 180 \}$. Additionally, our experiments set the $\alpha$ values to 0.01, 0.02, 0.03, 0.04, 0.05 (or 1\%, 2\%, 3\%, 4\%, 5\%, respectively). Lastly, the values assigned to parameter $\lambda$ are $ \{0, 0.5, 1 \}$. We randomly generated five instances for each combination of $|\Omega|$, $\alpha$, and $\lambda$, resulting in a total of 375 instances. Remark that every individual occurrence is produced by a distinct simulation sample using C2F, which randomly selects various combinations of ignition points and fire-weather conditions.
+We use the \texttt{Sub20} and \texttt{Sub40} landscapes from the Alberta
+region of Canada. They contain 400 and 1,600 burnable cells, respectively.
+Each cell covers $100\times100$~m$^2$. The landscape data are available from
+the Cell2Fire FBP repository at \url{https://github.com/fire2a/C2FFBP}.
+Fire-weather scenarios combine temperature,
+relative humidity, wind speed, wind direction, and fire-weather indices
+required by the Canadian Forest Fire Behaviour Prediction System
+\citep{hirsch1996canadian,pais2021cell2fire}. The weather data were obtained
+from the Climate Information Section of Alberta Agriculture and Forestry and
+the Yaha Tinda Auto station. We retain observations above the 95th percentile
+of mean temperature to represent adverse fire-weather conditions.
 
-In order to simplify the analysis, we assigned the same protection priority to every cell; thus, for every node $v \in \mathcal{V}$, we set the value of $w_v$ equal to 1. Also, the parameter $\beta$ was fixed on 0.9, meaning that CVaR will minimize the expected shortfall, which would be the average loss in the 10\% cases where the burned area exceeds its Value-at-Risk.
+For each landscape, the data set contains 10,000 Cell2Fire scenarios. For
+every scenario $s$, the data contain the Reburn graph $G_s^R$ and the shortest-path tree
+$G_s^T$ defined in Section~\ref{sec2}. Both representations have the same
+ignition and reached cells, and their common scenario identifier permits a
+paired comparison. All sampled scenarios are assigned probability
+$\rho_s=1/|\mathcal{S}|$. We use unit cell weights, so scenario loss is the
+number of burned cells.
 
-All procedures and mathematical formulations were implemented using Python programming language v3.10.9. The optimization problems were solved using the GUROBI Optimizer v10.0.2. The experimental procedures were executed on a computational framework featuring 12th Gen Intel(R) Core(TM) i5-12400 processor, with a speed of 2.50 GHz and 3,200 MHz Dual Channel 16 GB of RAM. The computations were performed on the Windows 10 Home 22H2 operating system.
+Training scenarios are sampled without replacement from identifiers 1--9,000.
+The main \texttt{Sub40} panel uses 100 and 200 training scenarios and five
+independent samples for each sample size. The \texttt{Sub20} panel uses 100
+training scenarios and ten independent samples. All methods use the same
+training identifiers within each landscape, sample size, and replication.
+Identifiers 9,001--10,000 form a fixed set of 1,000 out-of-sample scenarios
+and do not enter the optimization.
+
+\subsection{Compared methods}
+
+Table~\ref{tab:compared-methods} separates the benchmark methods from the
+proposed LLBI configurations. The extensive formulation, the baseline
+Branch-and-Benders method, and Combinatorial Benders are benchmarks. The
+proposed methods use the same Branch-and-Benders framework and differ only in
+the lower-bound inequalities added to the master problem.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Methods included in the computational comparison.}
+\label{tab:compared-methods}
+\begin{tabular}{p{0.16\linewidth}p{0.28\linewidth}p{0.47\linewidth}}
+\toprule
+Category & Method & Description \\
+\midrule
+Benchmark & FPP-SAA & Extensive formulation~\eqref{model:fpp}. \\
+Benchmark & B\&B-RootCuts & Branch-and-Benders with LP-based root cuts and no LLBI. \\
+Benchmark & Combinatorial Benders & Exact method of \citet{taninmics2024benders}, adapted to the FPP. \\
+\midrule
+Proposed & B\&B-LLBI & Standard LLBI~\eqref{ineq:standard-llbi}. \\
+Proposed & B\&B-Coverage-exp & Separated CoverageLLBI family~\eqref{ineq:coverage-family}. \\
+Proposed & B\&B-Path-poly & Static PathLLBI subset~\eqref{ineq:path-poly}. \\
+Proposed & B\&B-Path-exp & Separated PathLLBI family~\eqref{ineq:path-family}. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+CoverageLLBI-poly is not listed separately because it coincides with the
+standard LLBI. On tree scenarios, PathLLBI-poly also coincides with the
+standard LLBI, while the complete CoverageLLBI and PathLLBI families define
+the same bound. We retain the distinct implementations when measuring their
+construction and separation costs and use Reburn scenarios to compare the
+bounds when alternative propagation paths are present.
+
+The Combinatorial Benders benchmark uses initial and fractional cuts,
+heuristic lifting, and an initial 10\% scenario subset. Remaining
+scenarios are checked before an incumbent is accepted, so the inspection set
+changes only the search order. We test both the original order and decreasing
+order of the current scenario-loss estimates. These configurations are used
+only as benchmarks.
+
+Expected loss, CVaR, and mean--CVaR are objective settings for every method.
+We use $\beta=0.9$ and $\lambda=0.5$ for mean--CVaR; expected loss and pure
+CVaR correspond to $\lambda=0$ and $\lambda=1$, respectively.
+
+\subsection{Computational settings}
+
+The treatment fractions are $\alpha\in\{0.01,0.02,0.03\}$. Each run has a
+1,800-second time limit, a target relative optimality gap of $10^{-3}$, and
+one solver thread. The implementation is written in C++ and uses IBM ILOG
+CPLEX 22.1.1. Reported solution times include LLBI construction and root
+separation.
+
+The RootCuts configurations perform one LP-based separation round at the root
+node. The exponential LLBI configurations allow at most 100 root-separation
+rounds and 100 cuts per round, with a violation tolerance of $10^{-3}$. After
+root separation, candidate Benders cuts preserve exactness.
+
+% TODO: Insert the hardware and operating-system specifications used for the
+% final experiment campaign.
+
+\subsection{Evaluation protocol}
+
+We first compare solution time, objective value, best bound, certified gap,
+and the number of instances solved to the target tolerance. To assess the
+effect of the proposed inequalities, we also report the root bound, LLBI
+construction or separation time, and the number of root and candidate cuts.
+
+A placement obtained from tree scenarios is evaluated in three distinct
+ways. Its in-sample tree loss is computed on the training trees. Its paired
+Reburn loss is then computed on the Reburn graphs with the same scenario
+identifiers. This paired evaluation measures the effect of reducing the
+propagation graph and is not an out-of-sample test. Finally, the placement is
+evaluated on the fixed set of 1,000 unseen scenarios in the graph
+representation used for optimization. We report expected burned cells,
+empirical VaR at level 0.9, and empirical CVaR at level 0.9 for each
+evaluation.
+
+For the Reburn instances that can be solved within the time limit, we also
+compare the tree-based placement with a placement optimized directly on the
+Reburn graphs. This comparison separates the loss caused by the tree
+approximation from the optimization gap. The paired scenario identifiers and
+common cell set ensure that both placements are evaluated under the same fire
+realizations.
 
 \section{Results and discussion}
 \label{S:4}
