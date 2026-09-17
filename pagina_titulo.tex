@@ -1,0 +1,166 @@
+%% 
+%% Copyright 2019-2020 Elsevier Ltd
+%% 
+%% This file is part of the 'CAS Bundle'.
+%% --------------------------------------
+%% 
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.2 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.2 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%% 
+%% The list of all files belonging to the 'CAS Bundle' is
+%% given in the file `manifest.txt'.
+%% 
+%% Template article for cas-sc documentclass for 
+%% single column output.
+
+%\documentclass[a4paper,fleqn,longmktitle]{cas-sc}
+\documentclass[a4paper,fleqn]{cas-sc}
+
+%\usepackage[numbers]{natbib}
+\usepackage[authoryear]{natbib}
+%\usepackage[authoryear,longnamesfirst]{natbib}
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{todonotes}
+\usepackage[T1]{fontenc}
+\usepackage{verbatimbox}
+\usepackage{graphics}
+
+\usepackage{supertabular}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+\usepackage{xr-hyper}
+\usepackage{hyperref}
+
+%\externaldocument[supp-]{../supplementstuff.tex}
+\usepackage{cleveref}
+
+\makeatletter
+\newcommand*{\addFileDependency}[1]{% argument=file name and extension
+  \typeout{(#1)}
+  \@addtofilelist{#1}
+  \IfFileExists{#1}{}{\typeout{No file #1.}}
+}
+\makeatother
+
+\newcommand*{\myexternaldocument}[1]{%
+    \externaldocument{#1}%
+    \addFileDependency{#1.tex}%
+    \addFileDependency{#1.aux}%
+}
+
+
+%\externaldocument[supp-]{supplementstuff}
+\myexternaldocument{supplementstuff}
+
+%\usepackage{xr}
+\newcommand{\beginsupplement}{
+    \setcounter{section}{0}
+    \renewcommand{\thesection}{S\arabic{section}}
+    \setcounter{equation}{0}
+    \renewcommand{\theequation}{S\arabic{equation}}
+    \setcounter{table}{0}
+    \renewcommand{\thetable}{S\arabic{table}}
+    \setcounter{figure}{0}
+    \renewcommand{\thefigure}{S\arabic{figure}}
+    \newcounter{SIfig}
+    \renewcommand{\theSIfig}{S\arabic{SIfig}}}
+
+\usepackage{comment}
+
+\usepackage{gensymb}
+\usepackage{booktabs}
+\usepackage{adjustbox}
+\usepackage{lscape}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{multirow}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{booktabs}
+\usepackage{amssymb}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{lineno}
+\usepackage{setspace}
+\doublespacing
+
+\usepackage[para,online,flushleft]{threeparttable}
+\usepackage{makecell}
+%%%Author macros
+\def\tsc#1{\csdef{#1}{\textsc{\lowercase{#1}}\xspace}}
+\def\code#1{\texttt{#1}}
+\tsc{WGM}
+\tsc{QE}
+\tsc{EP}
+\tsc{PMS}
+\tsc{BEC}
+\tsc{DE}
+%%%
+%\linenumbers
+
+\begin{document}
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
+\shorttitle{A new approach to protect landscape-scale biodiversity values under fire risk}
+\shortauthors{J. Carrasco et~al.}
+%\begin{frontmatter}
+
+\title [mode = title]{A two-stage stochastic programming approach incorporating spatially-explicit fire scenarios for optimal firebreak placement} 
+
+\author[2]{Mat\'ias Vilches}[]
+\ead{matias.vilches.a@usach.cl}
+
+
+\author[1,5]{Jaime Carrasco}[orcid=0000-0003-4123-4228]
+\cormark[1]
+\ead{jcarrascob@utem.cl}
+
+%\credit{Conceptualization; Investigation; Methodology; Visualization; Writing - original draft}
+
+\author[2,4]{Sebastián Dávila}[]
+\ead{sebastian.davila@usach.cl}
+
+%\credit{Data curation;  Writing; Review.}
+
+\author[5]{David Palacios}[]
+\ead{david.palacios@ug.uchile.cl}
+
+%\credit{Data curation; Review}
+
+\author[2,4]{Franco Quezada}[]
+\ead{franco.quezada@usach.cl}
+
+%\credit{Data curation; Review}
+
+\author[3,5]{Andr\'es Weintraub}[]
+\ead{aweintra@dii.uchile.cl}
+
+%\credit{Supervision; Review}
+
+\address[1]{Departamento de Industria, Facultad de Ingenier\'ia, Universidad Tecnol\'ogica Metropolitana, Santiago, Chile}
+
+\address[2]{University of Santiago of Chile (USACH), Faculty of Engineering, Industrial Engineering Department, Santiago, Chile}
+
+\address[3]{Industrial Engineering Department, University of Chile, Santiago, Chile}
+
+\address[4]{University of Santiago of Chile (USACH), Faculty of Engineering, Program for the Development of Sustainable Production Systems (PDSPS)}
+
+\address[5]{Complex Engineering System Institute - ISCI, Santiago, Chile}
+
+\cortext[cor1]{Corresponding author}
+
+\maketitle
+
+
+\end{document}

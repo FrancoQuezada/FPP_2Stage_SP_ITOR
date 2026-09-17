@@ -1,0 +1,65 @@
+%% Use the option review to obtain double line spacing
+\documentclass[10pt]{article}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{hyperref}
+%\usepackage[demo]{graphicx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{cleveref}
+\usepackage{comment}
+%\usepackage{xr-hyper}
+\newcommand{\beginsupplement}{
+    \setcounter{section}{0}
+    \renewcommand{\thesection}{S\arabic{section}}
+    \setcounter{equation}{0}
+    \renewcommand{\theequation}{S\arabic{equation}}
+    \setcounter{table}{0}
+    \renewcommand{\thetable}{S\arabic{table}}
+    \setcounter{figure}{0}
+    \renewcommand{\thefigure}{S\arabic{figure}}
+    \newcounter{SIfig}
+    \renewcommand{\theSIfig}{S\arabic{SIfig}}}
+
+
+\begin{document}
+
+%% Title, authors and addresses
+%\title{Supplementary Information: \\ \\ Combining optimization and fire simulation modeling to protect biodiversity values at landscape scale}
+
+%\author{Jaime Carrasco$^{a,b,}$\footnote{To whom correspondence should be addressed at Industrial Engineering Department, University of Chile, Santiago, Chile, E-mail: \url{jaimecarrasco@ug.uchile.cl}}, Rodrigo Mahaluf$^{a}$, Cristobal Pais$^{b,e}$, David Palacios$^{a}$, Fulgencio Lisón$^{c,d}$, Alejandro Miranda$^{d,f}$, and Andr\'es Weintraub$^{a,b}$ }
+
+%\maketitle  
+\begin{comment}
+\noindent
+{$^{a}$University of Chile, Industrial Engineering Department, Santiago, Chile \\
+$^{b}$Complex Engineering System Institute - ISCI, Santiago, Chile. \\ 
+$^{c}$Wildlife Ecology and Conservation Lab, Departamento de Zoología, Fac. Ciencias Naturales y Oceanográficas, Universidad de Concepción, Casilla 160-C, Concepción, Chile \\
+$^{d}$Universidad de La Frontera, Departamento de Ciencias Forestales, Laboratorio de Ecología del Paisaje y Conservación, Temuco, Chile. \\
+$^{e}$University of California Berkeley, IEOR Department, Berkeley, USA.} \\
+$^{f}$University of Chile, Center for Climate and Resilience Research (CR$^{2}$), Santiago, Chile. \\
+\end{comment}
+
+%\end{comment}
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Instances
+
+\beginsupplement
+\noindent
+%\textbf{Supplementary Information}
+%\label{S:SuplementaryMaterial}
+\noindent
+\section*{A firebreak siting model for optimizing biodiversity protection at landscape scale}
+
+Jaime Carrasco$^{a,b,}$\footnote{To whom correspondence should be addressed at Industrial Engineering Department, University of Chile, Santiago, Chile, E-mail: \url{jaimecarrasco@ug.uchile.cl}}, Rodrigo Mahaluf$^{a}$, Fulgencio Lisón$^{c,d}$, Cristobal Pais$^{b,e}$, Alejandro Miranda$^{d,f}$, Felipe de la Barra$^{a}$, David Palacios$^{a}$, and Andr\'es Weintraub$^{a,b}$ \\
+
+\noindent
+{$^{a}$University of Chile, Industrial Engineering Department, Santiago, Chile \\
+$^{b}$Complex Engineering System Institute - ISCI, Santiago, Chile. \\ 
+$^{c}$Wildlife Ecology and Conservation Lab, Departamento de Zoología, Fac. Ciencias Naturales y Oceanográficas, Universidad de Concepción, Casilla 160-C, Concepción, Chile \\
+$^{d}$Universidad de La Frontera, Departamento de Ciencias Forestales, Laboratorio de Ecología del Paisaje y Conservación, Temuco, Chile. \\
+$^{e}$University of California Berkeley, IEOR Department, Berkeley, USA.} \\
+$^{f}$University of Chile, Center for Climate and Resilience Research (CR$^{2}$), Santiago, Chile. \\
+
+
+\end{document}

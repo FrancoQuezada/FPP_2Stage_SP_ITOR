@@ -1,0 +1,168 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{comment}
+\usepackage{amsmath, bm}
+\usepackage[margin=1in]{geometry}
+
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand\encircle[1]{%
+  \tikz[baseline=(X.base)] 
+    \node (X) [draw, shape=circle, inner sep=0] {\strut #1};}
+    
+\newcommand\ensquare[1]{%
+  \tikz[baseline=(X.base)] 
+    \node (X) [draw, shape=rectangle, inner sep=0] {\strut #1};}
+
+\newcommand\ML[1]{{\color{magenta} #1}}
+\usepackage{graphicx}
+\usepackage{pgfplots}
+\pgfplotsset{%
+    ,compat=1.12
+    ,every axis x label/.style={at={(current axis.right of origin)},anchor=north west}
+    ,every axis y label/.style={at={(current axis.above origin)},anchor=north east}
+    }
+
+\newcommand{\cmd}[1]{\textcolor{red}{#1}} %Color para revision 
+\newcommand{\chgblue}[1]{\textcolor{blue}{#1}}
+\newcommand{\chggreen}[1]{\textcolor{green}{#1}}
+
+\begin{document}
+\begin{flushright}
+\today
+\end{flushright}
+
+
+Dear Prof.  Steffen Rebennack,\\
+\\
+
+
+Please find enclosed the revised version of the manuscript ``A two-stage stochastic programming approach incorporating spatially-explicit fire scenarios for optimal firebreak placement'' intended for publication in the European Journal of Operational Research. \\
+
+We took into consideration all the comments and suggestions of the reviewers and modified the paper accordingly. Changes to the article are highlighted in red to facilitate the review.  We explain how we addressed each of the reviewers' comments below.  We believe that the article has improved significantly thanks to the reviewers' comments.  We look forward to the next iteration in the review process of this article. \\
+\\
+
+Thank you very much in advance. \\ 
+
+Yours faithfully
+\\
+
+\begin{flushright}
+Sebasti\'an D\'avila G.
+\end{flushright}
+
+
+
+\newpage
+
+\begin{center}
+\section*{Answer to Reviewer 1}
+\end{center}
+
+The authors present a novel two-stage stochastic programming model for the placement of firebreaks to block the spread of future wildfires. Fire propagation is incorporated on a graph-based representation of the landscape and behaves according to predetermined fire scenarios supplied by a dedicated simulation software. The authors show convincing results of a well-designed set of computational experiments on close-to-real-world problem instances, which clearly show the benefits of apply the proposed model.\\
+
+\noindent \textbf{Major comments}\\
+
+\noindent \textbf{Comment 1} \textit{The manuscript is nicely written and fits well into the scope of EJOR. It presents a very nice and relevant application of the two-stage stochastic programming paradigm. (Some of) The authors are clearly experts in the field of wildfire prevention. The main contribution lies in the innovative model and application, while the applied methodology is largely standard. Therefore, I suggest that the manuscript might better be treated as an "Innovative Applications of OR" submission. To meet the high standards of EJOR, the manuscript could benefit from applying some more sophisticated solution techniques and/or methods. Two ideas come to mind (maybe you have more):}\\
+
+\begin{itemize}
+    \item \textit{Application of the "Scenario Decomposition" method by Ahmed, 2013}.\\
+    
+    \textbf{Answer}: We appreciate the reviewer's insightful comment and agree that a decomposition method based on Benders Decomposition (BD) is a suitable solution approach. In the Method Resolution section, we have incorporated details of the BD approach for our optimization model. Given that the variable $\bf{x}$ allows for integrality relaxation, the master problem involves the allocation of firebreaks ($\bf{y}$), while the subproblems are associated with the evaluation of each scenario.
+
+    \item \textit{Treating the constraints (8d) as "lazy constraints" / cutting planes (start with a subset of these constraints and add only those that are violated by the current optimal solution).}
+
+    \textbf{Response:} Thank you for your suggestion regarding the use of lazy constraints or a cutting-plane approach for constraint set (8d). The rationale behind this technique is that the optimal solution typically satisfies only a small subset of all constraints, allowing one to begin with a reduced model and iteratively add only the violated constraints, potentially improving computational performance.
+    
+    Constraint (8d) governs the propagation of fire across the forest under each scenario $\omega$,  and its number scales with the size of the graph $|\mathcal{V}|$ and the number of scenarios $|\Omega|$. This initially suggests that a lazy constraint implementation could be beneficial.
+    
+    However, in our specific context, most of the constraints in (8d) tend to be active in the optimal solution. These constraints, of the form $x_v^\omega \leq x_u^\omega + y_u$, encode the fire spread dynamics from node $u$ to node $v$ in scenario $\omega$. When node $v$ is burned in a given scenario, it is usually due to the ignition of one of its neighbors unless a firebreak is built. Conversely, if $v$ is not burned, it implies that either all its neighbors are protected or unaffected.
+
+    Due to this dependency structure, most of the constraints in (8d) are tight at optimality, and omitting them initially results in numerous constraint violations that must be added later—causing repeated evaluations and increasing the computational burden. For this reason, we experimented with implementing constraint (8d) as lazy constraints but observed no performance improvement in terms of runtime or convergence behavior.
+
+    For these reasons, we opted not to implement constraint (8d) as lazy constraints in our final approach.
+  
+
+\end{itemize}
+
+
+\noindent \textbf{Minor comments and typos}
+
+\begin{enumerate}
+    \item[(i)] p3, Sec2: \textit{In my ears the section title sounds odd. Maybe you find a better one.}
+    \item[(ii)] p3, l-15: \textit{"the set of simulations"}
+    \item[(iii)] p5, l1: \textit{"aims to find an"}
+    \item[(iv)] p7: I \textit{would suggest to move Section 3.1 into Section 4.}
+    \item[(v)] p9, l19: "\textit{formulation by the ??}"
+    \item[(vi)] p9, Fig3: "\textit{connectivity}"
+    \\ 
+\end{enumerate}
+\textbf{Answer}: Thank you for your corrections. Specifically, (i) we have changed the title of Section 2 from "\textit{Material and Methods}" to "\textit{Theoretical Framework to FPP under Uncertainty}"; (iv) we agree with the suggestion and have moved Section 3.1 to Section 4; and (v) we corrected the incomplete sentence to the appropriate tense: "\textit{These graphs are incorporated into the mathematical formulation by the set of constraints}". In addition, other minor comments (ii), (iii), and (vi) have been addressed.
+
+
+\newpage
+\section*{Answer to Reviewer 2}
+
+\noindent \textbf{Comment 1} \textit{Due to the high standard of the EJOR journal, this paper cannot be accepted in its present form. As mentioned, the methodology is simplistic, becoming the major obstacle to being applicable in practice. Nevertheless, there is significant room for improvement because solving the problem can be enhanced using standard decomposition techniques for stochastic problems. I’ll be pleased to review a revision of this paper adding a stronger methodology able to solve larger instances.}\\
+
+\textbf{Answer}: We appreciate the reviewer's insightful comment and agree that a Decomposition method based on a Bender Decomposition (BD) is a suitable method of solution. In the Section Method Resolution, we incorporated the details of BD for our optimization model. Briefly, given the variable $x$ is possible to relax integrality, the master problem involves the allocation of firebreak ($\bf{y}$), while the subproblems are associated with the evaluation of each scenario. \\
+
+\noindent \textbf{Comment 2} \textit{How are defined the scenarios that you need 5 simulations for each number of scenarios? It means that, for instance, the number of scenarios is 100, and the simulation is repeated five times with 100 scenarios, isn’t it? Why is not defined directly with 500 scenarios? Or are obtained different solutions from the model in each of the five repetitions?}\\
+
+\textbf{Answer}: We appreciate the reviewer's comment. In order to clarify that point, we rewrote the design experiment.  Each simulation is defined by an ignition point and the weather  reflects a possible scenario. Then, we generate 100 samples for each instance, in order to prove the robustness obtained by stochastic solution in a test of 1,000 scenarios. Unlike, we weren't able to solve instances with 500 scenarios due to its computational expansiveness, and we will propose as future works study large-scale methods to solve problems with more scenarios and more forest size. \\
+
+\noindent \textbf{Comment 3} \textit{Figure 9 is very disappointing. Random location achieves similar solutions to the others with 1\% and 2\% of firebreaks, and similar with other percentages using only 20 scenarios. And, regarding the images, it looks more important using a number big enough of scenarios, than the parameter $\lambda$. It is a key analysis; it is the validation of the model. An image with the different values of $\lambda$ would be welcomed to compare the differences (one image or three images, one per each number of scenarios).}\\
+
+\textbf{Answer}: We appreciate the reviewer’s comment, which highlights an important point. Figure 9 evaluates the stochastic solution obtained from the model in the dynamic case. Currently, the proposed mathematical formulation is limited to the static case, where scenarios assume that the fire scar does not change after firebreaks are allocated. Thus, the similarities between the results of the random and model solutions in scenarios with lower numbers are a consequence of the model’s current limitations in predicting fire behavior once firebreaks are placed in the landscape. The purpose of this test is to illustrate the challenges that need to be addressed in future work. 
+
+Nevertheless, regarding the results, it is true that adding more scenarios improves performance compared to the random solution, as it incorporates additional information, thereby enhancing the robustness of the solution. Concerning the parameter $\lambda$, it reflects the decision maker’s preference for the amount expected of cells burnt versus resilience against worst-case scenarios. The current results indicate minimal differences in performance across $\lambda$ values, which may be due to the model’s limitations in capturing the worst-case scenarios in the 1000-scenario test. Finally, in response to the comment about $\lambda$ values, we have included the requested images in the Appendix section. \\
+
+\noindent \textbf{Minor comments and typos}
+\begin{enumerate}
+    \item p9, \textit{second paragraph of 4.2: the following sentence is not finished: These graphs are incorporated into the mathematical formulation by the.}
+    \item s4: \textit{please, put the figures where are named in the text, it has been difficult to pass pages and pages following the referenced figures. As well as put the caption of each image closer to the image, not closer to the next image.}
+    \\\end{enumerate}
+
+\textbf{Answer}: Thank you for your correction. We have completed the previously incomplete phase and have adjusted the plots to align with the description in the text body.
+
+\section*{Answer to Reviewer 3}
+\noindent \textbf{Comment 1} \textit{It is not clear the advantage of including the computational experiments Sub40 and Sub100. Sub20 is a 400ha landscape, of 20x20 cells, each of them being 100$\times$100m$^2$. But Sub40 and Sub 100 are not clear. It is written that cells are 100$\times$100m$^2$ also for these two cases, and Sub40 looks to be 40$\times$40 cells, and Sub100 100$\times$100 cells. However, in these two cases Figures 10 and 11 shows 1km to be the length of each side of the square}. \\
+
+\textbf{Answer}: We appreciate the reviewer’s observation. Indeed, Sub40 and Sub100 are constructed using 100$\times$100m$^2$ cells. Consequently, we have corrected the legends of Figures 10 and 11. The purpose of these experiments is to study whether the current model and solution method can solve forest instances of realistic size. \\
+
+\noindent \textbf{Comment 2} \textit{Moreover, in section 4.3, the explanation about the MIP gap is not clear. It is normal the results for Sub40, increasing the MIP gap when increasing the parameter $\alpha$, since there are more feasible combinations. But it is said later that for Sub60 (please note that Sub60 has not been included in the computational study) and Sub100 the MIP gap decreases when increasing $\alpha$. It should be explained, if I have well understood, that Sub 100 is a 100x100 cells case (10,000 cells), 1\% is 100 cells and 5\% is 500, and the number of scenarios is 100. In such a case, the solution can be put firebreaks around the ignition point of the 100 scenarios (but these are 1\% of the possible scenarios). There are more possible combinations, but the solution is easier to be reached. The subsequent explanation is not clear, and there is a number 8 missing in the formula of page 14 ($\alpha$ $card(V)=8 card(\omega)$). After this explanation, it could be shown the performance with 1000 scenarios, as it has been done with Sub20.
+In summary, these cases must be better explained, and perhaps, their study extended a little bit. And one of the conclusions should be that the number of scenarios should be big enough related to the number of firebreaks to be located.} \\
+
+\textbf{Answer}: We appreciate the reviewer’s insightful comments. First, we have corrected the mention of the "Sub60" forest to "Sub40" as suggested. Second, the reviewer’s observation regarding the behavior of the MIP gap in relation to the parameter $\alpha$ is indeed accurate. The parameter $\alpha \in [0,1]$ defines the percentage of cells designated for firebreaks, and as the forest size increases, the number of feasible firebreak combinations also grows. Consequently, in larger forest instances (such as Sub100), higher values of $\alpha$ indicate more firebreaks, making it easier to cover ignition points. Indeed, the instance becomes trivial to solve if $\alpha |V| \geq 8|\Omega|$, where each ignition point is effectively covered. Here, the value 8 corresponds to the neighboring cells around each ignition point that would need to be protected to prevent fire spread. 
+
+However, we note that this value of $8|\Omega|$ is an upper bound, as it does not account for border cells and non-fuel areas (e.g., lakes or rocky terrain), which would reduce the required number of firebreaks. 
+
+Finally, it is worth noting that the test with 1000 scenarios was conducted on the "Sub20" case to analyze the robustness of the solution against a larger set of scenarios. This highlights the importance of selecting an appropriate number and representative set of scenarios. Meanwhile, the computational experiments on the "Sub40" and "Sub100" forests were designed to evaluate the model’s capability and the solution method’s performance on real-sized forest instances. As the reviewer suggested, we have extended our analysis to include additional scenarios and incorporated the 1000-scenario test to demonstrate the model's performance in a more comprehensive setting. \\
+    
+\noindent \textbf{Comment 3} \textit{One minor question for figures 1 and 2 is that it is not well understood that some cells burn since the legend put a red dot into a square with black line, and it is clear when the background is dark, but it is not so clear when the background is light green. The border of the square is missing for light green cells burning, and it is not clear when seeing the figure. Also, in Figure 2 would be nice to see the saved cells.} \\
+
+\textbf{Answer}: We appreciate the reviewer’s observation. We have corrected the legend to correspond with both figures and have highlighted in the caption the number of cells saved by each firebreak configuration. \\
+
+\noindent \textbf{Comment 4} \textit{From equation (8d) it looks that all the adjacent cells burn or are firebreaks. But, it is only for those cells belonging to $\delta^{\ast}_\omega (v)$, is it mean that this constraint applies only for those cells reached from v in the scenario simulated without firebreaks? It should be clearly explained.}\\ 
+
+\textbf{Answer}: We appreciate the reviewer’s comment, and we have provided a clearer explanation of constraint (8d) in Section 3. As noted by the reviewer, given a scenario $\omega$, constraint (8d) describes the spread of fire from a cell $v$, which can occur only within the fire scar generated for that scenario (i.e., $\delta^{\omega}(v)$), built without firebreaks. For this reason, we refer to the model as the static case, where the fire scar does not change when firebreaks are added. 
+
+In contrast, when the fire scar is modified in response to the presence of a firebreak, we describe it as the dynamic version of the model. In the dynamic case, $ \delta^\omega (v) $ also depends on the firebreak configuration $\vb{x}$ selected in the first stage, and thus, it becomes $ \delta^\omega (v, \vb{x}) $. This dependency creates a larger feasible solution space and presents additional computational challenges, necessitating an ad-hoc formulation and solution method to address them. Consequently, we propose this dynamic version as future work. \\
+
+\noindent \textbf{Minor comments and typos}
+\begin{enumerate}
+
+    \item \textit{Page 6, fifth line from the end, a small mistake: the subindex of w is v instead of omega.}
+    \item \textit{Page 7, explanation of the constraints: In particular, the constraint (8f) force… It should be constraint (8e), as well as for being nonnegative is constraint (8f) instead of (8g).}
+\end{enumerate}
+
+\textbf{Answer}: Thank you for your correction. We have modified them.
+
+%\bibliographystyle{apalike}
+%\bibliography{Paper/sample.bib}
+%\*{Answers to the reviewer 4}
+
+\end{document}

@@ -1,0 +1,143 @@
+%% Use the option review to obtain double line spacing
+\documentclass[10pt]{article}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{hyperref}
+%\usepackage[demo]{graphicx}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{cleveref}
+\usepackage{comment}
+%\usepackage{xr-hyper}
+\newcommand{\beginsupplement}{
+    \setcounter{section}{0}
+    \renewcommand{\thesection}{S\arabic{section}}
+    \setcounter{equation}{0}
+    \renewcommand{\theequation}{S\arabic{equation}}
+    \setcounter{table}{0}
+    \renewcommand{\thetable}{S\arabic{table}}
+    \setcounter{figure}{0}
+    \renewcommand{\thefigure}{S\arabic{figure}}
+    \newcounter{SIfig}
+    \renewcommand{\theSIfig}{S\arabic{SIfig}}}
+
+
+\begin{document}
+
+%% Title, authors and addresses
+%\title{Supplementary Information: \\ \\ Combining optimization and fire simulation modeling to protect biodiversity values at landscape scale}
+
+%\author{Jaime Carrasco$^{a,b,}$\footnote{To whom correspondence should be addressed at Industrial Engineering Department, University of Chile, Santiago, Chile, E-mail: \url{jaimecarrasco@ug.uchile.cl}}, Rodrigo Mahaluf$^{a}$, Cristobal Pais$^{b,e}$, David Palacios$^{a}$, Fulgencio Lisón$^{c,d}$, Alejandro Miranda$^{d,f}$, and Andr\'es Weintraub$^{a,b}$ }
+
+%\maketitle  
+\begin{comment}
+\noindent
+{$^{a}$University of Chile, Industrial Engineering Department, Santiago, Chile \\
+$^{b}$Complex Engineering System Institute - ISCI, Santiago, Chile. \\ 
+$^{c}$Wildlife Ecology and Conservation Lab, Departamento de Zoología, Fac. Ciencias Naturales y Oceanográficas, Universidad de Concepción, Casilla 160-C, Concepción, Chile \\
+$^{d}$Universidad de La Frontera, Departamento de Ciencias Forestales, Laboratorio de Ecología del Paisaje y Conservación, Temuco, Chile. \\
+$^{e}$University of California Berkeley, IEOR Department, Berkeley, USA.} \\
+$^{f}$University of Chile, Center for Climate and Resilience Research (CR$^{2}$), Santiago, Chile. \\
+\end{comment}
+
+%\end{comment}
+%\clearpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Instances
+
+\beginsupplement
+\noindent
+%\textbf{Supplementary Information}
+%\label{S:SuplementaryMaterial}
+\noindent
+\section*{Supplementary Information of: \\ \\ ``A two-stage stochastic programming approach incorporating spatially-explicit fire scenarios for optimal firebreak placement"}
+
+Jaime Carrasco$^{a,b,}$\footnote{To whom correspondence should be addressed at Industrial Engineering Department, University of Chile, Santiago, Chile, E-mail: \url{jaimecarrasco@ug.uchile.cl}}, Rodrigo Mahaluf$^{a,b}$, Fulgencio Lisón$^{c,d}$, Cristobal Pais$^{b,e}$, Alejandro Miranda$^{d,f}$, Felipe de la Barra$^{a}$, David Palacios$^{a,b}$, and Andr\'es Weintraub$^{a,b}$ \\
+
+\noindent
+{$^{a}$University of Chile, Industrial Engineering Department, Santiago, Chile \\
+$^{b}$Complex Engineering System Institute - ISCI, Santiago, Chile. \\ 
+$^{c}$Wildlife Ecology and Conservation Lab, Departamento de Zoología, Fac. Ciencias Naturales y Oceanográficas, Universidad de Concepción, Casilla 160-C, Concepción, Chile \\
+$^{d}$Universidad de La Frontera, Departamento de Ciencias Forestales, Laboratorio de Ecología del Paisaje y Conservación, Temuco, Chile. \\
+$^{e}$University of California Berkeley, IEOR Department, Berkeley, USA.} \\
+$^{f}$University of Chile, Center for Climate and Resilience Research (CR$^{2}$), Santiago, Chile. \\
+
+\begin{figure*}[h!]
+	%\centering
+        \centerline{\includegraphics[scale=1]{Pictures/violin_plot.pdf}}
+        \caption{Distribution of the values of wind speed and direction, temperature and relative humidity that are included in the 100 fire weather scenarios that were used in our study.}
+	\label{fig:violin_plot}
+\end{figure*}
+
+\begin{figure*}[h!]
+	%\centering
+    \centerline{\includegraphics[scale=.54]{Pictures/Combined_index.pdf}}
+    \caption{Combined Index Map.}
+	\label{fig:IdexResults}
+\end{figure*}
+
+\begin{figure*}[h!]
+	%\centering
+    \centerline{\includegraphics[scale=.54]{Pictures/IPM.pdf}}
+    \caption{Fire Ignition Probability Map.}
+	\label{fig:IPM}
+\end{figure*}
+
+\begin{figure*}[h!]
+	%\centering
+    \centerline{\includegraphics[scale=.54]{figs/LN_DPV.pdf}}
+    \caption{Map of the Downstream Protection Value natural logarithm.}
+	\label{fig:DPV}
+\end{figure*}
+
+\begin{figure*}[h!]
+	%\centering
+    \centerline{\includegraphics[scale=.54]{figs/DPV_zoom.pdf}}
+    \caption{Downstream Protection Value Map.}
+	\label{fig:log_DPV}
+\end{figure*}
+
+
+
+\begin{table}[!ht]
+\centering
+\caption{Number of bird's occurrences by species, sorted in decreasing order.}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{rlr | rlr}
+  \hline
+\# & Especie & Obs. & \# & Especie & Obs.\\ 
+  \hline
+  1 & \textit{Milvago chimango} & 265 & 29 & \textit{Podilymbus podiceps} &  87 \\ 
+    2 & \textit{Theristicus melanopis} & 250 & 30 & \textit{Larus dominicanus} &  86\\
+    3 & \textit{Vanellus chilensis} & 243 & 31 & \textit{Anas flavirostris} &  79 \\ 
+    4 & \textit{Elaenia albiceps} & 188 & 32 & \textit{Enicognathus leptorhynchus} &  79\\
+    5 & \textit{Aphrastura spinicauda} & 184 & 33 & \textit{Notiochelidon cyanoleuca} &  79 \\  
+    6 & \textit{Tachycineta leucopyga} & 174 &  34 & \textit{Passer domesticus} &  79 \\  
+    7 & \textit{Turdus falcklandii} & 164 & 35 & \textit{Scytalopus magellanicus} &  79\\ 
+    8 & \textit{Sephanoides sephanoides} & 146 & 36 & \textit{Mimus thenca} &  78 \\
+    9 & \textit{Troglodytes aedon} & 145 & 37 & \textit{Zonotrichia capensis} &  75\\
+   10 & \textit{Scelorchilus rubecula} & 143 & 38 & \textit{Megaceryle torquata} &  68 \\
+   11 & \textit{Anairetes parulus} & 127 & 39 & \textit{Campephilus magellanicus} &  62 \\
+   12 & \textit{Pygarrhichas albogularis} & 119 & 40 & \textit{Anas georgica} &  60 \\
+   13 & \textit{Spinus barbatus} & 115 & 41 & \textit{Ardea alba} &  55 \\  
+   14 & \textit{Cinclodes patagonicus} & 112 & 42 & \textit{Sturnella loyca} &  55 \\
+   15 & \textit{Phrygilus patagonicus} & 110 & 43 & \textit{Columba livia} &  54 \\
+   16 & \textit{Fulica armillata} & 109 & 44 & \textit{Zenaida auriculata} &  52 \\
+   17 & \textit{Podiceps major} & 108 & 45 & \textit{Buteo polyosoma} &  50  \\
+   18 & \textit{Chroicocephalus maculipennis} & 106 & 46 & \textit{Colorhamphus parvirostris} &  47 \\
+   19 & \textit{Xolmis pyrope} & 106 & 47 & \textit{Sicalis luteola} &  40 \\ 
+   20 & \textit{Patagioenas araucana} & 103 & 48 & \textit{Cinclodes fuscus} &  37 \\
+   21 & \textit{Phalacrocorax brasilianus} &  96 & 49 & \textit{Sylviorthorhynchus desmursii} &  36 \\
+   22 & \textit{Pteroptochos tarnii} &  94 & 50 & \textit{Cathartes aura} &  34 \\
+   23 & \textit{Coragyps atratus} &  93 & 51 & \textit{Dryobates lignarius} &  34 \\
+   24 & \textit{Curaeus curaeus} &  93 & 52 & \textit{Glaucidium nana} &  33 \\
+   25 & \textit{Egretta thula} &  93 & 53 & \textit{Chloephaga poliocephala} &  30 \\ 
+   26 & \textit{Enicognathus ferrugineus} &  93 & 54 & \textit{Falco sparverius} &  30 \\
+   27 & \textit{Colaptes pitius} &  92 & 55 & \textit{Molothrus bonariensis} &  30 \\
+   28 & \textit{Caracara plancus} &  87 \\  
+   \hline
+\end{tabular}}
+\label{tab:birds}
+\end{table}
+
+
+\end{document}

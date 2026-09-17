@@ -1,0 +1,17 @@
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+% \usepackage{graphicx}
+
+\begin{table}[h]
+\caption{Computational time and MIPGAP by $\alpha$ and forest size.}
+\label{tab:gap_time2}
+%\resizebox{\textwidth}{!}{%
+\begin{tabular}{rrrrrrrrrr}
+\hline
+\multicolumn{1}{l}{$\alpha$} & \multicolumn{1}{l}{Forest} & \multicolumn{1}{l}{\begin{tabular}[c]{@{}l@{}}C. Time {[}min{]}\end{tabular}} & \multicolumn{1}{l}{MIP$_{gap}$} & \multicolumn{1}{l}{Forest} & \multicolumn{1}{l}{\begin{tabular}[c]{@{}l@{}}C. Time {[}min{]}\end{tabular}} & \multicolumn{1}{l}{MIP$_{gap}$} \\ \hline
+1\%                     &                            & 1440                                                                              & 13.3                                                                                                                                                    &                            & 1440                                                                              & 35.2                      \\
+3\%                     & Sub40                      & 1440                                                                              & 32.9                                                                                                                                             & Sub100                     & 1440                                                                              & 19.5                      \\
+5\%                     &                            & 1440                                                                              & 35.7                                                                                                                       &                            & 1440                                                                              & 5.9                      \\ \hline
+\end{tabular}%
+%}
+\end{table}
