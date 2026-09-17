@@ -1,5 +1,4 @@
 \documentclass[a4paper,fleqn]{cas-sc}
- \usepackage{ulem} %Eliminar luego
  
 %\usepackage[numbers]{natbib}
 \usepackage[authoryear]{natbib}
@@ -8,7 +7,6 @@
 \usepackage{adjustbox}
 \usepackage{todonotes}
 \usepackage[T1]{fontenc}
-\usepackage{verbatimbox}
 \usepackage{graphics}
 \usepackage{physics}
 \usepackage{supertabular}
@@ -71,6 +69,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{color}
 \usepackage{amsmath}
+\usepackage{amsthm}
 \usepackage{lineno}
 \usepackage{setspace}
 %\doublespacing
@@ -88,6 +87,8 @@
 \tsc{DE}
 %%%
 %\linenumbers
+
+\newtheorem{proposition}{Proposition}
 
 \begin{document}
 \let\WriteBookmarks\relax
@@ -353,31 +354,72 @@ where $( \bullet )^+ = \max(\bullet, 0)$. This reformulation is widely used to r
 
 \section{FPP as a two-stage stochastic programming model}\label{s:general-model}
 
-In this study, we present a novel approach to address the FPP. Our proposed methodology involves a two-stage stochastic mixed-integer linear programming mathematical formulation.  We assume that the underlying stochastic input process has a finite probability space so that the information on the evolution of the uncertain parameters can be represented by a discrete set of scenarios $\Omega = \{ 1,\dots, |\Omega|\}$. The probability for scenario $\omega$ is given by $\rho^\omega$, with a total probability of 1 over all the scenarios, i.e., $\sum_{\omega \in \Omega} \rho^\omega = 1$.
+The first-stage decision selects a firebreak placement $y\in\mathcal{Y}$ before the fire scenario is known. In the second stage, the burned cells and the corresponding loss are determined for each scenario. The formulation below applies to a generic propagation graph $G_s=(V_s,E_s)$. In the computational experiments, $G_s$ is the shortest-path tree $G_s^T$ defined in Section~\ref{sec2}.
 
-Following the notation introduced in Section \ref{sec2}, $\tau_s$ is the wildfire scar resulting from a simulation $s$ of the Cell2Fire. It is characterized by a directed acyclic graph $\mathcal{T}^s=(\mathcal{V}^s,\mathcal{E}^s)$, which represents a possible scenario in the two-stage stochastic program. Let $v(\omega)$ be the node that denotes the ignition point of scenario $\omega$, i.e., the node that begins to spread the wildfire. Thus, we can define the stochastic problem scenario $\omega$ as a set of nodes $V^\omega$, an ignition point $v(\omega)$ and  the wildfire spread $\delta^\omega_+(v)$ from one node to another, where $\delta^{\omega}_{+}(v)$ denote the set of nodes that are incident from node $v \in \mathcal{V}^\omega$,  following the simulation of the Cell2Fire.
+For each $s\in\mathcal{S}$ and $k\in V_s$, let $x_{sk}$ equal one if cell $k$ burns in scenario $s$ and zero otherwise. To state the propagation constraints compactly, define $\bar y_{sk}=y_k$ if $k\in C\setminus\{r_s\}$ and $\bar y_{sk}=0$ otherwise. Thus, a selected cell blocks incoming propagation unless it is the ignition.
 
-
-In this approach, the first stage is to decide the firebreak placement, i.e., determining which set of cells will be treated, subject to $\alpha$, which represents the percentage of land to be used as firebreak selected by the decision-maker. Thus, we introduce a binary variable $y_v$ that takes the value 1 if the node $v \in \mathcal{V}$ is placed a firebreak and 0 otherwise. Meanwhile, in the second stage, the performance of these firebreak placements is evaluated in each scenario. Specifically, given the location of the firebreak determined in the first stage, the second stage calculates the number of burned cells in each scenario, taking into account the spread of wildfire simulated. Thus, let $x^\omega_v$ be a binary variable that takes value 1 if node $v \in \mathcal{V}^\omega$ is burned in the scenario $\omega$ after the firebreak placement and 0 otherwise. So the value of $L^\omega(\vb{y},\vb{w},\tau_s)$ can be calculated as $\sum_{v \in \mathcal{V}} w_\omega x_v^{\omega} $. The objective is to balance the optimization of the expected value (EV) and the conditional value at risk (CVaR) of the burned cell. Thus, we introduce the parameter $\lambda \in [0,1]$ to balance the trade-off between both objectives. By incorporating EV and CVaR into the optimization process, we aim to enhance the effectiveness and efficiency of firebreak placement strategies. This approach allows decision-makers to study different balances between these two objectives.  \\
-
-Thus, it follows that the mathematical model can be expressed in the following manner:
-\begin{subequations}
+The finite-scenario mean--CVaR formulation is
+\begin{subequations}\label{model:fpp}
 \begin{align}
-    \underset{\vb{x},\vb{y},\varphi, \vb{\eta}}{\text{minimize}} \quad &  \lambda \left(\sum_{\omega \in \Omega} \rho^\omega \sum_{v \in \mathcal{V}}w_v x_{v}^{\omega} \right) + (1-\lambda) \left (\varphi + \frac{1}{(1-\beta)} \sum_{\omega \in \Omega} \rho^\omega\eta^\omega \right)& \label{fo:min_expected4}
-\end{align}
-\begin{align}
-    \text{subject to: } 
-    & \sum_{v \in \mathcal{V}} y_{v} \leq \alpha \lvert \mathcal{V} \vert,& \label{c:capacity} \\
-    & x_{v(\omega)}^{\omega} = 1 & \omega \in \Omega, \label{c:ignition} \\
-    & x_{v}^{\omega} \leq x_{u}^{\omega} + y_{u} & v \in \mathcal{V},  \; u \in \delta^{\omega}_+(v) \; \omega \in \Omega,  \label{c:spread} \\
-    & \sum_{v \in \mathcal{V}^{\omega} }w_v x_v^\omega - \varphi \leq \eta^\omega & \forall \omega \in \Omega, \label{c:cvar_linearization} \\
-    & \eta^\omega \geq 0 &\forall \omega \in \Omega, \label{c:eta} \\
-    &\varphi \geq 0, &  \label{c:domain2} \\
-    & \bf{x}, \bf{y} \in \{0,1\}. \label{c:variables} 
+    \min_{y,x,\varphi,z}\quad
+    &(1-\lambda)
+      \sum_{s\in\mathcal{S}}\rho_s\sum_{k\in V_s}w_kx_{sk}
+      +\lambda\left(
+      \varphi+\frac{1}{1-\beta}
+      \sum_{s\in\mathcal{S}}\rho_s z_s
+      \right)
+      \label{model:fpp-objective}\\
+    \text{s.t.}\quad
+    &y\in\mathcal{Y},
+      \label{model:fpp-budget}\\
+    &x_{sr_s}=1,
+      &&s\in\mathcal{S},
+      \label{model:fpp-ignition}\\
+    &x_{si}\leq x_{sj}+\bar y_{sj},
+      &&s\in\mathcal{S},\ (i,j)\in E_s,
+      \label{model:fpp-propagation}\\
+    &x_{sk}\leq 1-\bar y_{sk},
+      &&s\in\mathcal{S},\ k\in V_s,
+      \label{model:fpp-firebreak}\\
+    &z_s\geq \sum_{k\in V_s}w_kx_{sk}-\varphi,
+      &&s\in\mathcal{S},
+      \label{model:fpp-excess}\\
+    &z_s\geq0,
+      &&s\in\mathcal{S},
+      \label{model:fpp-excess-domain}\\
+    &\varphi\geq0,
+      \label{model:fpp-threshold-domain}\\
+    &0\leq x_{sk}\leq1,
+      &&s\in\mathcal{S},\ k\in V_s.
+      \label{model:fpp-burn-domain}
 \end{align}
 \end{subequations}
 
-Equation\:\eqref{fo:min_expected4} minimizes the convex combination of the expected value of weighted burned nodes and the conditional value at risk. The first term corresponds to the sum of all burned cells \textit{v} weighted by parameter $w_v$ over all scenarios with a certain probability of occurrence $\rho$. Meanwhile, the second term seeks to minimize worst-case scenarios represented by the weighted sum of burned cells over the Value-at-Risk $\varphi$. We introduce the variable $\eta_\omega$ that allows linearization of the formulate \eqref{CVaR_Formula}. In particular, the constraint \eqref{c:cvar_linearization} force $\eta_{\omega}$ take the value  $L(\vb{y}, \vb{w}, \tau_\omega) - \varphi$, while the constraint \eqref{c:eta} force to take only nonnegative values. Note that when the parameter $\lambda$ is defined as 1, the optimization model optimizes the EV; however, when the value is defined as 0, only the CVaR is minimized. Constraints \eqref{c:capacity} define the limit of cells used as a firebreak based on the value of $\alpha$. Constraints \eqref{c:ignition} establish the origin of the wildfire, and Constraints \eqref{c:spread} define the propagation of fire in each scenario. This is as follows: given a scenario $\omega$ if the node (or cell) $v$ is burned, an incident node $u$ from node $v$ must also be burned unless a firebreak is allocated. Thus, given a starting ignition node, $v(\omega)$ in each scenario, the firebreaks limit the wildfire spread, and a decision has to be made in every node in which a firebreak can be assigned to stop the fire such that minimizes the objective function. Finally, the constraint \eqref{c:variables} defines the binary variables $\bf{x}$ and $\bf{y}$ declaring that not half harvest can be done at each node. Note that if the firebreak intensity is equal to zero (i.e., $\alpha=0$), the constraints \eqref{c:spread} recover the fire scar of each scenario.
+The objective~\eqref{model:fpp-objective} is the mean--CVaR criterion defined in~\eqref{eq:risk-averse-fpp}. Constraint~\eqref{model:fpp-budget} imposes the firebreak budget. Constraints~\eqref{model:fpp-ignition}--\eqref{model:fpp-firebreak} describe fire propagation. If cell $i$ burns and $(i,j)\in E_s$, then cell $j$ must burn unless it is selected as a firebreak. Constraint~\eqref{model:fpp-firebreak} prevents a selected non-ignition cell from burning. Constraints~\eqref{model:fpp-excess}--\eqref{model:fpp-threshold-domain} provide the linear CVaR representation. Setting $\lambda=0$ gives the expected-loss formulation, while $\lambda=1$ gives the pure CVaR formulation.
+
+For a fixed placement $y$, the scenario recourse function introduced in~\eqref{eq:scenario-loss} can equivalently be written as
+\begin{equation}
+\begin{aligned}
+Q_s(y)=\min_x\quad
+    &\sum_{k\in V_s}w_kx_{sk}\\
+\text{s.t.}\quad
+    &x_{sr_s}=1,\\
+    &x_{si}\leq x_{sj}+\bar y_{sj}, &&(i,j)\in E_s,\\
+    &x_{sk}\leq1-\bar y_{sk}, &&k\in V_s,\\
+    &0\leq x_{sk}\leq1, &&k\in V_s.
+\end{aligned}
+\label{model:scenario-recourse}
+\end{equation}
+
+\begin{proposition}\label{prop:recourse}
+For every $y\in\mathcal{Y}$ and $s\in\mathcal{S}$, problem~\eqref{model:scenario-recourse} is feasible and bounded and admits an optimal binary solution.
+\end{proposition}
+
+\begin{proof}
+Remove the selected non-ignition cells from $G_s$ and let $R_s(y)$ be the cells reachable from $r_s$. The incidence vector of $R_s(y)$ satisfies~\eqref{model:scenario-recourse}. Conversely, the propagation constraints force every cell in $R_s(y)$ to have value one. The incidence vector is therefore componentwise minimal and is optimal because $w_k\geq0$.
+\end{proof}
+
+Proposition~\ref{prop:recourse} shows that the binary restrictions on $x$ can be relaxed without changing the optimal value. The model also has relatively complete recourse, so its Benders reformulation requires only optimality cuts.
 
 \subsection{Computational experiments}
 %\textcolor{red}{In this study, we use real landscapes for our experiments, namely \texttt{Sub100}, situated in the Alberta region of Canada. \texttt{Sub20} represents a forest patch covering an area of 400 hectares (depicted in Fig.\:\ref{fig:graphs}), this region is a partition of \texttt{Sub100} that is employed for the assessment of the optimization model. Additionally, for our computational experiments, \texttt{Sub100} is further subdivided into \texttt{Sub40}. The landscape is divided into $100 \times 100$ m$^2$ cells, and their detailed landscape information can be found at \url{https://github.com/fire2a/C2FFBP}. We use Cell2Fire to conduct simulations of multiple wildfires, which requires fire-weather scenarios (FWS) specific to the study area \citep{parisien2005mapping, pais2021cell2fire}. These scenarios encompass crucial factors such as temperature, relative humidity, wind speed, wind direction, and fire weather indices, which are necessary inputs to the FBP system \citep{hirsch1996canadian} (see, e.g., Fig.\:\ref{fig:graphs_landscape}-\textbf{B}). To ensure the representation of extreme conditions, we exclusively considered scenarios that exceeded the 95th percentile mean temperature.}
