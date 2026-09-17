@@ -423,7 +423,7 @@ Proposition~\ref{prop:recourse} shows that the binary restrictions on $x$ can be
 
 \section{Graph-based lower-bound inequalities}\label{sec:llbi}
 
-This section introduces valid inequalities that strengthen the scenario recourse approximations used in a Branch-and-Benders-cut framework. The decomposition framework provides the solution method in which the inequalities are applied. The contribution of this paper concerns the lower-bound inequalities and their graph-based constructions.
+This section introduces valid inequalities that strengthen the scenario recourse approximations used in a Branch-and-Benders-cut framework \citep{rahmaniani2017benders}. The decomposition framework provides the solution method in which the inequalities are applied. The contribution of this paper concerns the lower-bound inequalities and their graph-based constructions.
 
 \subsection{Branch-and-Benders framework}
 
@@ -483,6 +483,200 @@ Let $\mathcal{P}_s(y)=\mathcal{B}_s^0\setminus\mathcal{B}_s(y)$ be the cells pro
 \end{proof}
 
 On a propagation tree, $d_{si}$ equals the loss avoided by selecting $i$ alone. On a graph with alternative paths, it is an optimistic bound because some downstream cells may still be reached through a path that avoids $i$. The inequality remains valid, but its coefficients may count the same potential protection several times when several firebreaks are selected. CoverageLLBI and PathLLBI address this limitation using cell-level graph information.
+
+\subsection{CoverageLLBI}
+
+For each $k\in\mathcal{B}_s^0$, define
+$\mathcal{A}_{sk}=\{i\in C\cap(\mathcal{B}_s^0\setminus\{r_s\}):
+k\in D_s(i)\}$. Thus, $\mathcal{A}_{sk}$ contains the eligible cells whose
+downstream sets contain $k$. Membership in this set represents potential
+coverage; on a graph with alternative paths, selecting one member does not
+necessarily protect $k$. Let $\mathcal{K}_s^C=\{k\in\mathcal{B}_s^0:
+\mathcal{A}_{sk}\neq\emptyset\}$.
+
+CoverageLLBI introduces a continuous variable $\zeta_{sk}$ for every
+$k\in\mathcal{K}_s^C$ and adds
+\begin{subequations}\label{model:coverage-llbi}
+\begin{align}
+    &\theta_s\geq q_s^0-
+      \sum_{k\in\mathcal{K}_s^C}w_k\zeta_{sk},
+      \label{model:coverage-llbi-bound}\\
+    &\zeta_{sk}\leq\sum_{i\in\mathcal{A}_{sk}}y_i,
+      &&k\in\mathcal{K}_s^C,
+      \label{model:coverage-llbi-cover}\\
+    &0\leq\zeta_{sk}\leq1,
+      &&k\in\mathcal{K}_s^C.
+      \label{model:coverage-llbi-domain}
+\end{align}
+\end{subequations}
+The upper bound in~\eqref{model:coverage-llbi-domain} prevents the potential
+protection of one cell from being counted more than once. For a fixed $y$,
+the projected lower bound is
+$q_s^0-\sum_{k\in\mathcal{K}_s^C}w_k
+\min\{1,\sum_{i\in\mathcal{A}_{sk}}y_i\}$.
+
+Eliminating $\zeta$ gives the following family in the original master
+variables:
+\begin{equation}
+    \theta_s\geq q_s^0
+    -\sum_{k\in\mathcal{K}_s^C\setminus U}w_k
+    -\sum_{k\in U}w_k
+       \sum_{i\in\mathcal{A}_{sk}}y_i,
+    \qquad U\subseteq\mathcal{K}_s^C.
+    \label{ineq:coverage-family}
+\end{equation}
+
+\begin{proposition}\label{prop:coverage-projection}
+System~\eqref{model:coverage-llbi} is valid, and its projection onto
+$(y,\theta_s)$ is exactly the family~\eqref{ineq:coverage-family}.
+\end{proposition}
+
+\begin{proof}
+If $k$ is protected, every ignition-to-$k$ path contains a selected cell in
+$\mathcal{A}_{sk}$. Hence, its protection indicator is at most
+$\min\{1,\sum_{i\in\mathcal{A}_{sk}}y_i\}$, which proves validity. The
+projection follows from
+\[
+q_s^0-\sum_{k\in\mathcal{K}_s^C}w_k
+\min\left\{1,\sum_{i\in\mathcal{A}_{sk}}y_i\right\}
+=\max_{U\subseteq\mathcal{K}_s^C}
+\left\{q_s^0-\sum_{k\in\mathcal{K}_s^C\setminus U}w_k
+-\sum_{k\in U}w_k\sum_{i\in\mathcal{A}_{sk}}y_i\right\}.
+\]
+\end{proof}
+
+The complete family~\eqref{ineq:coverage-family} is exponential. At a
+fractional point $\bar y$, its most violated member is obtained by taking
+$U=\{k\in\mathcal{K}_s^C:
+\sum_{i\in\mathcal{A}_{sk}}\bar y_i<1\}$. This separation requires only the
+coverage sums and defines CoverageLLBI-exp.
+
+CoverageLLBI-poly retains the member obtained with
+$U=\mathcal{K}_s^C$:
+\begin{equation}
+    \theta_s\geq q_s^0-
+    \sum_{k\in\mathcal{K}_s^C}w_k
+    \sum_{i\in\mathcal{A}_{sk}}y_i.
+    \label{ineq:coverage-poly}
+\end{equation}
+Reversing the order of summation shows that the coefficient of $y_i$ is
+$-d_{si}$. Therefore, CoverageLLBI-poly coincides with the standard
+LLBI~\eqref{ineq:standard-llbi} under the definitions used here.
+
+\subsection{PathLLBI}
+
+PathLLBI uses explicit propagation paths. Let $\mathcal{P}_{sk}$ be the set
+of directed simple paths from $r_s$ to $k$, and let
+$\widehat{\mathcal{P}}_{sk}\subseteq\mathcal{P}_{sk}$ be the paths retained
+by a given construction. For a path $p$, define
+$C(p)=C\cap(V(p)\setminus\{r_s\})$. The terminal cell is included when it is
+eligible, whereas the ignition is always excluded. For $k=r_s$,
+$\mathcal{P}_{sk}$ contains the trivial path with $C(p)=\emptyset$.
+
+For each $k\in\mathcal{B}_s^0$, let $b_{sk}$ be a lower bound on its burn
+variable. The extended PathLLBI system is
+\begin{subequations}\label{model:path-llbi}
+\begin{align}
+    &\theta_s\geq\sum_{k\in\mathcal{B}_s^0}w_kb_{sk},
+      \label{model:path-llbi-bound}\\
+    &b_{sk}+\sum_{i\in C(p)}y_i\geq1,
+      &&k\in\mathcal{B}_s^0,\ p\in\widehat{\mathcal{P}}_{sk},
+      \label{model:path-llbi-path}\\
+    &0\leq b_{sk}\leq1,
+      &&k\in\mathcal{B}_s^0.
+      \label{model:path-llbi-domain}
+\end{align}
+\end{subequations}
+Constraint~\eqref{model:path-llbi-path} is valid because cell $k$ burns if
+the corresponding path contains no selected firebreak. For fractional $y$,
+the same inequality follows by summing the propagation constraints along the
+path.
+
+To describe the projection, let $\bot$ mean that no path is selected for a
+cell. A path system $\pi$ assigns to each $k\in\mathcal{B}_s^0$ either a path
+in $\widehat{\mathcal{P}}_{sk}$ or $\bot$, and
+$K(\pi)=\{k:\pi_k\neq\bot\}$. The projected family is
+\begin{equation}
+    \theta_s\geq
+    \sum_{k\in K(\pi)}w_k
+    \left(1-\sum_{i\in C(\pi_k)}y_i\right),
+    \qquad
+    \pi\in\prod_{k\in\mathcal{B}_s^0}
+    \left(\widehat{\mathcal{P}}_{sk}\cup\{\bot\}\right).
+    \label{ineq:path-family}
+\end{equation}
+
+\begin{proposition}\label{prop:path-projection}
+The projection of system~\eqref{model:path-llbi} onto $(y,\theta_s)$ is
+exactly the family~\eqref{ineq:path-family}. If
+$\widehat{\mathcal{P}}_{sk}=\mathcal{P}_{sk}$ for every $k$, this family
+describes the epigraph of $Q_s$.
+\end{proposition}
+
+\begin{proof}
+For fixed $y$, the smallest feasible value of $b_{sk}$ is
+\[
+\max\left\{0,
+1-\min_{p\in\widehat{\mathcal{P}}_{sk}}
+\sum_{i\in C(p)}y_i\right\}.
+\]
+Selecting independently one active term for each cell gives
+\eqref{ineq:path-family}. When all paths are retained, let $\delta_{sk}(y)$
+be the minimum path sum. Every feasible burn vector satisfies
+$x_{sk}\geq[1-\delta_{sk}(y)]^+$. Conversely, the vector
+$x_{sk}=[1-\delta_{sk}(y)]^+$ satisfies the propagation constraints and is
+componentwise minimal. Its weighted sum is therefore $Q_s(y)$.
+\end{proof}
+
+PathLLBI-exp uses all ignition-to-cell paths without enumerating them. At a
+fractional point $\bar y$, assign cost $\bar y_i$ when a path enters an
+eligible non-ignition cell $i$ and zero otherwise. A single-source
+shortest-path computation gives $\delta_{sk}(\bar y)$ for every cell. The
+most violated member of~\eqref{ineq:path-family} selects a shortest path for
+each cell with $\delta_{sk}(\bar y)<1$ and selects $\bot$ otherwise.
+
+PathLLBI-poly retains one static member of~\eqref{ineq:path-family}. For each
+cell $k$, let $\widehat p_{sk}$ be the first directed simple path found by a
+depth-first traversal whose outgoing neighbors are ordered by cell index. The
+resulting inequality is
+\begin{equation}
+    \theta_s\geq
+    \sum_{k\in\mathcal{B}_s^0}w_k
+    \left(1-\sum_{i\in C(\widehat p_{sk})}y_i\right).
+    \label{ineq:path-poly}
+\end{equation}
+This rule generates one reproducible inequality per scenario. It is a valid
+polynomial-size subset, not a compact representation of the complete family.
+
+\subsection{Relations between the lower bounds}
+
+Let $L_s^{\mathrm{LLBI}}(y)$, $L_s^C(y)$, and $L_s^P(y)$ denote the right-hand
+sides of the standard LLBI, the complete coverage projection, and the complete
+path projection, respectively. For $y\in[0,1]^{|C|}$,
+\begin{equation}
+    L_s^{\mathrm{LLBI}}(y)
+    \leq L_s^C(y)
+    \leq L_s^P(y)
+    =Q_s(y).
+    \label{eq:llbi-strength-order}
+\end{equation}
+The first inequality follows from the cell-level coverage caps. The second
+follows because the candidates on any ignition-to-cell path form a subset of
+$\mathcal{A}_{sk}$. The final equality is established in
+Proposition~\ref{prop:path-projection}.
+
+On a propagation tree, each cell has one ignition path and
+$\mathcal{A}_{sk}=C(p_{sk})$. Consequently, CoverageLLBI-exp and
+PathLLBI-exp define the same bound and both describe $Q_s$. The standard LLBI,
+CoverageLLBI-poly, and PathLLBI-poly also coincide. On a Reburn graph,
+alternative paths distinguish the constructions, and the complete path bound
+dominates the complete coverage bound.
+
+The exponential families are separated only during the prescribed root
+rounds; they need not be generated completely. The Benders optimality cuts
+remain responsible for exactness after root separation. Since every inequality
+is stated for an individual scenario loss, it remains valid under the
+expected-loss, CVaR, and mean--CVaR objectives.
 
 \section{Computational experiments}\label{sec:computational-experiments}
 %\textcolor{red}{In this study, we use real landscapes for our experiments, namely \texttt{Sub100}, situated in the Alberta region of Canada. \texttt{Sub20} represents a forest patch covering an area of 400 hectares (depicted in Fig.\:\ref{fig:graphs}), this region is a partition of \texttt{Sub100} that is employed for the assessment of the optimization model. Additionally, for our computational experiments, \texttt{Sub100} is further subdivided into \texttt{Sub40}. The landscape is divided into $100 \times 100$ m$^2$ cells, and their detailed landscape information can be found at \url{https://github.com/fire2a/C2FFBP}. We use Cell2Fire to conduct simulations of multiple wildfires, which requires fire-weather scenarios (FWS) specific to the study area \citep{parisien2005mapping, pais2021cell2fire}. These scenarios encompass crucial factors such as temperature, relative humidity, wind speed, wind direction, and fire weather indices, which are necessary inputs to the FBP system \citep{hirsch1996canadian} (see, e.g., Fig.\:\ref{fig:graphs_landscape}-\textbf{B}). To ensure the representation of extreme conditions, we exclusively considered scenarios that exceeded the 95th percentile mean temperature.}
