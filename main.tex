@@ -175,61 +175,71 @@ In this paper, we present a novel approach based on a two-stage stochastic progr
 
 The remaining part of this paper is organized as follows. Section~\ref{sec2} provides a theoretical background and introduces the basic notations and assumptions for the problem. In Section \ref{s:general-model}, we introduce a two-stage stochastic programming formulation for the problem. Computational experiments and results are presented in Section~\ref{S:4}. Finally, the conclusions and directions for further work are discussed in Section~\ref{Sec:conclusions}.
 
-\section{Problem description}\label{sec2}
+\section{Material and Methods}\label{sec2}
 
-\subsection{Landscape and propagation graphs}
+This section introduces the landscape, fire scenarios, feasible firebreak placements, and risk measures used to formulate the firebreak placement problem (FPP).
 
-Let $V$ be the set of forest or burnable cells in the landscape. Each cell $k\in V$ has a nonnegative loss weight $w_k$. Unit weights measure the number of burned cells, whereas heterogeneous weights represent differences in the values exposed to fire.
+\subsection{Theoretical background}
 
-Let $\mathcal{S}$ be a finite set of fire scenarios generated with Cell2Fire \citep{pais2021cell2fire}. Each scenario $s\in\mathcal{S}$ has probability $\rho_s$ and ignition cell $r_s$, where $\sum_{s\in\mathcal{S}}\rho_s=1$. Cell2Fire records the fire spread as a directed Reburn graph
-\[
-    G_s^R=(V_s,E_s^R),
-\]
-where $V_s\subseteq V$ contains the cells reached in the simulation and $(i,j)\in E_s^R$ indicates propagation from cell $i$ to cell $j$ \citep{pais2021downstream}. A cell may have several predecessors in $G_s^R$.
+The landscape is represented by a graph $\mathcal{F}=(V,E)$. The set $V$ contains the forest or burnable cells defined by the resolution of the georeferenced data, while $E$ represents adjacency between cells. Each cell $k\in V$ has a nonnegative loss weight $w_k$. Unit weights measure the number of burned cells. Heterogeneous weights can represent differences in the values exposed to fire \citep{carrasco2023firebreak}.
 
-For optimization, we extract a shortest-path tree
-\[
-    G_s^T=(V_s,E_s^T)
-\]
-rooted at $r_s$. All arcs have unit length, and predecessor ties are broken by cell index. Hence, $E_s^T\subseteq E_s^R$, while both graphs contain the same cells and ignition. The tree retains every cell reachable in the Reburn graph.
+Wildfire uncertainty concerns both the ignition cell and the subsequent fire spread. These components depend on the landscape, weather conditions, and ignition process \citep{carrasco2021exploring}. We represent this uncertainty by a finite set $\mathcal{S}$ of fire scenarios generated with Cell2Fire \citep{pais2021cell2fire}. Each scenario $s\in\mathcal{S}$ has probability $\rho_s$ and ignition cell $r_s$, with $\sum_{s\in\mathcal{S}}\rho_s=1$.
 
-Figure~\ref{fig:graphs_landscape} shows the landscape, a simulated fire, and its weather conditions. The computational experiments optimize the tree scenarios and evaluate the resulting placements on their paired Reburn graphs.
+Cell2Fire records the propagation of scenario $s$ as a directed Reburn graph $G_s^R=(V_s,E_s^R)$. The set $V_s\subseteq V$ contains the cells reached by the simulated fire, and an arc $(i,j)\in E_s^R$ indicates propagation from cell $i$ to cell $j$ \citep{pais2021downstream}. A cell may have several predecessors in this graph, representing alternative propagation directions.
+
+For optimization, we extract a shortest-path tree $G_s^T=(V_s,E_s^T)$ rooted at $r_s$. All arcs have unit length, and ties between shortest-path predecessors are broken by cell index. The tree and Reburn graph contain the same cells and ignition, while $E_s^T\subseteq E_s^R$. Thus, the tree preserves the cells reached in the simulation but retains one propagation path from the ignition to each cell. We solve the FPP on the tree scenarios and subsequently evaluate the resulting placements on their paired Reburn graphs.
+
+Cell2Fire uses the Canadian Forest Fire Behaviour Prediction System to simulate fire spread from landscape and weather data \citep{hirsch1996canadian}. Figure~\ref{fig:graphs_landscape} shows the \texttt{Sub20} landscape, a simulated fire, its ignition, and the corresponding weather conditions.
 
 \begin{figure}[h]
 \centering
 \includegraphics[scale=.5]{figs/example1_sub20_and_weather.pdf}
 \vspace{1ex}
-\caption{A simulated fire and its weather conditions.}
+\caption{\textbf{A}: The \texttt{Sub20} landscape and a simulated fire. \textbf{B}: The corresponding fire-weather conditions.}
 \label{fig:graphs_landscape}
 \end{figure}
 
-\subsection{Firebreak placements}
+\subsection{Feasible solutions}
 
-Let $C\subseteq V$ be the set of cells eligible for treatment. The binary variable $y_i$ equals one if a firebreak is placed at $i\in C$. A selected non-ignition cell does not burn and blocks incoming propagation. The ignition always burns and propagates, even if it belongs to the selected set.
+The FPP selects cells where vegetation is removed to create non-flammable barriers. Let $C\subseteq V$ be the set of cells eligible for firebreak placement. For each $i\in C$, the binary variable $y_i$ equals one if a firebreak is placed at cell $i$ and zero otherwise. A selected non-ignition cell blocks incoming propagation and does not burn. The ignition always burns and propagates, even if it is eligible and selected.
 
-The parameter $\alpha\in[0,1]$ is the maximum fraction of forest or burnable cells that can be treated. The integer budget is $B=\lfloor\alpha|V|\rfloor$, and the feasible set is
+Only a limited fraction of the landscape can be treated \citep{oliveira2016assessing,jingan2005land}. Let $\alpha\in[0,1]$ denote this fraction and let $B=\lfloor\alpha|V|\rfloor$ be the corresponding integer budget. The set of feasible firebreak placements is
 \begin{equation}
     \mathcal{Y}=
     \left\{y\in\{0,1\}^{|C|}:\sum_{i\in C}y_i\leq B\right\}.
     \label{eq:feasible-placements}
 \end{equation}
 
-\subsection{Scenario losses and risk measures}
+\subsection{Expected loss}
 
-For a placement $y\in\mathcal{Y}$, let $\mathcal{B}_s^g(y)$ be the cells that burn in graph $G_s^g$, where $g\in\{T,R\}$. The scenario loss is
+For a placement $y\in\mathcal{Y}$, let $\mathcal{B}_s^g(y)$ be the set of cells that burn under graph representation $g\in\{T,R\}$. The loss in scenario $s$ is
 \begin{equation}
     Q_s^g(y)=\sum_{k\in\mathcal{B}_s^g(y)}w_k.
     \label{eq:scenario-loss}
 \end{equation}
-Because $E_s^T\subseteq E_s^R$, $Q_s^T(y)\leq Q_s^R(y)$ for every placement. We write $Q_s(y)$ when the graph representation is fixed.
+We write $Q_s(y)$ when the graph representation is fixed. Since $E_s^T\subseteq E_s^R$, removing arcs cannot create additional propagation. Therefore, $Q_s^T(y)\leq Q_s^R(y)$ for every placement $y$.
 
-The expected loss is
+The risk-neutral FPP minimizes the expected scenario loss
 \begin{equation}
-    \mathbb{E}_{\rho}[Q(y)]=
+    \min_{y\in\mathcal{Y}}
     \sum_{s\in\mathcal{S}}\rho_s Q_s(y).
-    \label{eq:expected-loss}
+    \label{eq:expected-fpp}
 \end{equation}
-For a fixed placement and confidence level $\beta\in(0,1)$, Conditional Value-at-Risk is \citep{rockafellar2000optimization}
+Under unit weights, $Q_s(y)$ is the number of cells that burn in scenario $s$. Under heterogeneous weights, it is the total loss associated with those cells.
+
+Figure~\ref{fig:graphs} illustrates two placements for the same scenario. The second placement blocks more propagation paths and therefore produces a smaller scenario loss.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=.5]{figs/example2_efficients_firebreaks.pdf}
+\vspace{1ex}
+\caption{Two firebreak placements evaluated under the same fire scenario.}
+\label{fig:graphs}
+\end{figure}
+
+\subsection{Conditional Value-at-Risk}
+
+Expected loss does not distinguish between placements with similar averages but different losses in adverse scenarios. We therefore also consider Conditional Value-at-Risk (CVaR). For a fixed placement $y$ and confidence level $\beta\in(0,1)$, CVaR represents the mean loss in the upper tail of the scenario-loss distribution. Following \citet{rockafellar2000optimization}, it can be written as
 \begin{equation}
     \operatorname{CVaR}_{\beta}(Q(y))=
     \min_{\varphi\in\mathbb{R}}
@@ -237,17 +247,18 @@ For a fixed placement and confidence level $\beta\in(0,1)$, Conditional Value-at
     \varphi+
     \frac{1}{1-\beta}
     \sum_{s\in\mathcal{S}}\rho_s[Q_s(y)-\varphi]^+
-    \right\}.
+    \right\},
     \label{eq:cvar}
 \end{equation}
-The mean--CVaR objective is
+where $[a]^+=\max\{a,0\}$ and $\varphi$ is the associated threshold. We combine expected loss and CVaR through
 \begin{equation}
-    (1-\lambda)\mathbb{E}_{\rho}[Q(y)]
+    \min_{y\in\mathcal{Y}}
+    (1-\lambda)\sum_{s\in\mathcal{S}}\rho_sQ_s(y)
     +\lambda\operatorname{CVaR}_{\beta}(Q(y)),
     \qquad \lambda\in[0,1].
-    \label{eq:mean-cvar}
+    \label{eq:risk-averse-fpp}
 \end{equation}
-Thus, $\lambda=0$ gives expected loss and $\lambda=1$ gives pure CVaR.
+The value $\lambda=0$ gives the expected-loss model, $\lambda=1$ gives the pure CVaR model, and intermediate values give the mean--CVaR model.
 
 \begin{comment}
 \section{Material and Methods}
