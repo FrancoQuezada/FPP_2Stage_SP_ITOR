@@ -251,9 +251,11 @@ $A_{sk}=C(p_{sk})$ and
 \end{equation}
 Moreover, the all-unsaturated coverage cut and the one-path-per-cell
 static path cut both equal the standard LLBI. Consequently, a runtime
-difference between separated CoverageLLBI and PathLLBI on actual trees
-cannot by itself demonstrate stronger \emph{complete} bounds. Finite
+difference between separated CoverageLLBI and PathLLBI on a \emph{verified}
+tree cannot by itself demonstrate stronger \emph{complete} bounds. Finite
 separation, cut selection, construction time and solver interaction are
-distinct sources of computational differences. On a general Reburn graph,
-the complete path bound may be strictly stronger than complete coverage,
-but the principal experiments optimize trees.
+distinct sources of computational differences. The actual reduced graphs
+are predominantly DAGs, on which complete PathLLBI can be strictly
+stronger than complete CoverageLLBI. The implemented path family stores
+a limited number of paths per cell; its separation need not attain the
+complete-path envelope.

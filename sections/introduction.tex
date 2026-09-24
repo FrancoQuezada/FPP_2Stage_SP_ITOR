@@ -1,72 +1,68 @@
 \section{Introduction}\label{sec:introduction}
 
 Firebreaks interrupt the spread of fire through a landscape, but their
-effect depends on where a future fire starts and which propagation routes
-it follows. Their placement must therefore be decided before much of the
-relevant information is known. Fuel-treatment planning has long used
-spatial optimization, and two-stage stochastic models provide a way to
-represent uncertain fire behavior explicitly
-\citep{agee2000use,kabli2015stochastic}. A sampled wildfire scenario is
-particularly useful when it preserves the geography of a simulated fire
-rather than representing risk by independent cell scores.
+effect depends on where a future fire starts and which propagation
+routes it follows. Placement must therefore be decided before the fire
+realization is known. Fuel-treatment planning has used spatial
+optimization and two-stage stochastic models for uncertain wildfire
+behavior \citep{agee2000use,kabli2015stochastic}. A sampled scenario
+can preserve the geography of a simulated fire rather than reducing
+risk to independent cell scores.
 
-Cell2Fire generates spatially explicit fire realizations that can support
-planning decisions \citep{pais2021cell2fire}; network measures such as
-downstream protection value have also been used to identify potentially
-important treatment locations \citep{pais2021downstream}. When a
-simulated realization is represented by a directed propagation graph,
-several routes may lead to the same cell. Keeping these alternatives
-matters when assessing a proposed firebreak: blocking one route need
-not protect a cell that can be reached through another. The same graph
-complexity, however, makes a stochastic optimization model with many
-scenarios difficult to solve. A method that simplifies propagation
-must therefore be judged both by its computational value and by the
-quality of the resulting decisions under the original propagation
-representation.
+Cell2Fire generates spatially explicit fire realizations that can
+support planning decisions \citep{pais2021cell2fire}; downstream network
+value also helps identify potentially useful treatment locations
+\citep{pais2021downstream}. Multiple routes in a directed propagation
+graph matter when assessing a proposed firebreak: blocking one route
+need not protect a cell reachable through another. Retaining those
+routes across hundreds of scenarios, however, can make optimization
+costly. Reduced propagation graphs provide a tractable representation
+whose solver behavior and decision quality require separate evaluation.
 
-We investigate this trade-off by constructing, for each original
-Reburn graph, a rooted shortest-path spanning tree on the same
-scenario cells. The trees are the \emph{optimization} scenarios. A
-firebreak placement selected on these scenarios is subsequently
-evaluated on its paired Reburn graphs, using the same ignitions and
-scenario identifiers. The reduction preserves an original route to
-each cell but can delete alternatives. It consequently gives an
-optimistic loss for any fixed placement. Paired Reburn evaluation
-measures the discrepancy introduced by the reduction; assessing
-placements on unused scenarios is a separate generalization test.
+Here the optimization input labeled \texttt{shortest\_path} is the
+\emph{reduced shortest-path graph}; a separate Reburn input denotes the
+original propagation representation. The labels do
+not make the reduced graph a rooted tree. In the 20-by-20 campaign,
+preflight classifies 86.83\% of reduced scenarios as acyclic DAGs that
+are not trees, 12.41\% as rooted arborescences and 0.76\% as empty or
+invalid. If the graphs in a pair have identical cells, ignition and
+weights and the reduced arc set is included in the Reburn arc set, a
+fixed placement has no greater loss on the reduced graph. The original
+scenario inputs needed to check those premises and evaluate the same
+placement on both graphs are absent from the committed results. We
+therefore do not infer the quality of the graph reduction from
+independently solved reduced and Reburn objectives.
 
-The reduced stochastic problem remains a mixed-integer optimization
-problem: one treatment plan must work across many graph realizations
-and, under CVaR, across adverse outcomes. Branch-and-Benders separates
-the common treatment decisions from scenario propagation
-\citep{rahmaniani2017benders}. Root relaxations can still underestimate
-scenario loss while their recourse cuts are incomplete. We exploit
-graph structure to supply valid lower estimates based on downstream
-reachability, capped cell coverage and explicit ignition-to-cell paths.
-The relationship among these estimates is particularly sharp on trees,
-where every cell has one ignition path. Combinatorial Benders for
-network spread provides a separate exact methodological comparator
-\citep{taninmics2024benders}.
+The sampled placement problem remains a mixed-integer program: one
+treatment plan must work across many graph realizations and, under
+CVaR, limit adverse losses. Branch-and-Benders separates the shared
+placement from scenario propagation \citep{rahmaniani2017benders}.
+Root relaxations can underestimate losses when recourse cuts are
+incomplete. We study structural lower bounds based on downstream
+reachability, capped coverage and ignition-to-cell paths, as well as a
+combinatorial Benders comparator motivated by network-spread methods
+\citep{taninmics2024benders}. The complete path family describes
+fractional recourse on a general directed graph. Only on a rooted tree
+does complete coverage also coincide with it; practical path
+separation retains only a limited set of paths.
 
-This paper makes four precise methodological contributions. It
-formulates expected-loss and upper-tail stochastic firebreak placement
-on reduced propagation graphs while separating paired original-graph
-evaluation from independent testing. It characterizes scenario recourse
-by reachability, establishing an optimal integral burn vector and
-relatively complete recourse. It derives downstream, coverage and path
-lower bounds, including projected families and a proof that the
-complete coverage and path envelopes coincide with fractional recourse
-on rooted trees. Finally, it integrates these bounds into an exact
-Branch-and-Benders implementation and specifies a matched evaluation
-protocol for optimization and graph-reduction quality. The repository
-snapshot supplied for this revision does not contain completed numerical
-runs, so the paper draws no empirical performance conclusion.
+This article contributes a stochastic reachability formulation with
+relatively complete recourse, proofs of the validity and projection of
+the structural bounds, and a numerically audited comparison of exact
+methods on matched scenario samples. The complete 810-run reduced
+\texttt{new20x20} panel covers three objectives, three training sizes
+and six methods per objective. It supplies certification counts,
+time-limited gaps and paired solver times. A distinct 1,440-run
+\texttt{Sub20} panel tests polynomial and separated projected
+inequalities. These data support statements about computational
+certification on the reported panels; corrupted placement/evaluation
+fields, incomplete Reburn runs and missing source graphs preclude
+conclusions about out-of-sample placement quality or the reduced/Reburn
+loss difference.
 
-Section~\ref{sec:setting} defines the graph reduction and its
-consequence for loss. Section~\ref{sec:model} gives the stochastic
-formulation and recourse analysis. Section~\ref{sec:methods} develops
-the exact decomposition and its structural inequalities.
-Section~\ref{sec:computational} states the verified experiment protocol;
-Section~\ref{sec:results} distinguishes analytical implications from
-currently unavailable run-level evidence. Section~\ref{sec:conclusions}
-summarizes the results and remaining empirical question.
+Section~\ref{sec:setting} specifies the graphs and conditional reduction
+result; Section~\ref{sec:model} develops the stochastic model and
+recourse. Section~\ref{sec:methods} proves the bound relationships.
+Sections~\ref{sec:computational} and \ref{sec:results} document the
+recorded experiments and numerical evidence, followed by conclusions
+in Section~\ref{sec:conclusions}.

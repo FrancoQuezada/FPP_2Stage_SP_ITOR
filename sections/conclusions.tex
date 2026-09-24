@@ -1,34 +1,37 @@
 \section{Conclusions}\label{sec:conclusions}
 
-We formulated firebreak placement under a finite sample of ignition and
-propagation scenarios. The decision is optimized on rooted tree reductions
-of directed Cell2Fire propagation graphs and then evaluated on the paired
-original Reburn graphs. This design separates two questions that are often
-conflated: how to solve the reduced stochastic program and how much loss is
-introduced when the placement is assessed using the omitted propagation
-routes. For the same placement and a verified arc-subset construction, tree
-loss is a lower bound on Reburn loss; the tree optimum is not thereby a
-Reburn optimum.
+We formulated stochastic firebreak placement on reduced directed
+propagation graphs and characterized its scenario recourse by
+reachability. The recourse LP has a componentwise minimal integral burn
+vector for every binary placement and relatively complete recourse.
+Downstream, capped-coverage and path inequalities provide valid master
+bounds. Their complete projections satisfy an explicit hierarchy:
+complete paths recover fractional recourse on general directed graphs,
+while coverage coincides with paths on \emph{rooted trees}. The reported
+reduced inputs are mostly non-tree DAGs, and the implemented path
+separator retains a limited number of paths; theoretical tree
+equalities must be used under their stated assumptions.
 
-The scenario recourse LP has a reachable-set optimal solution for every
-binary placement, including when some cell weights vanish. This gives
-relatively complete recourse and supports exact LP-dual Branch-and-Benders
-cuts. We developed the standard downstream LLBI, a cellwise capped
-coverage bound and a propagation-path bound. Their projections explain
-both valid root separation and the relative strengths of the complete
-families. On rooted trees, complete coverage and complete path bounds
-coincide with fractional recourse, while their specified static cuts
-coincide with the standard LLBI. These equalities constrain how any
-future runtime differences should be interpreted.
+The reproducible \texttt{new20x20} reduced panel contains 810 matched
+runs under expected loss, CVaR and mean--CVaR. For example, the
+Path-exp method reaches the requested $10^{-3}$ gap in 39, 21 and 30
+of 45 cases for the three objectives, respectively; the LP-dual root
+baseline reaches it in 26, 15 and 15. These counts characterize solver
+certification at a 1,800-second limit. Paired-runtime comparisons on
+jointly certified instances and final gaps of unresolved instances
+provide further, explicitly conditional evidence. A separate 1,440-run
+\texttt{Sub20} campaign permits the polynomial versus separated
+projected-inequality comparison, but its 62 extensive-model validation
+warnings prevent unrestricted solution-quality comparisons.
 
-The present repository snapshot does not provide nonempty final solver
-runs or paired graph evaluations. We consequently draw no empirical
-conclusion about scalability, comparative speed, optimality gaps,
-out-of-sample quality or the size of the Reburn/tree discrepancy.
-Completing those comparisons requires the actual scenario graphs,
-successful run-level results and solver provenance, plus checks of
-rooted-tree structure, arc inclusion and common identifiers. Once
-available, paired differences across objectives and treatment budgets
-will reveal where a tractable tree approximation is accurate enough and
-where retaining alternative propagation routes is important for
-decisions.
+The value of the reduced representation for firebreak \emph{decisions}
+remains open. The first campaign's Reburn records are incomplete; all
+60 corresponding reduced/Reburn training splits differ; and the
+committed summary lacks correctly aligned placements and evaluation
+fields. The original graph inputs are also unavailable for checking
+cell sets, ignitions and arc inclusion. A first priority is to restore
+those inputs and run artifacts, and to evaluate each fixed reduced
+placement on the \emph{same} scenario identifiers in both graphs.
+Independent held-out evaluation and a matched spatial-scaling panel
+would then support conclusions about decision quality and scalability
+beyond the present reduced 20-by-20 experiments.

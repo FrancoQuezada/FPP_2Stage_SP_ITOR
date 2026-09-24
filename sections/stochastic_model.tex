@@ -1,12 +1,12 @@
 \section{Two-stage stochastic formulation}\label{sec:model}
 
 The placement is chosen before scenario $s$ is observed. Afterwards, fire
-propagates along the directed arcs of $G_s^T$ and incurs the loss in
+propagates along the directed arcs of $G_s^D$ and incurs the loss in
 \eqref{eq:loss}. This is a two-stage problem in the decision-theoretic
 sense: the second-stage burn states are determined by the first-stage
 placement and the realized graph, with no additional treatment decision.
 We first give a formulation for a generic scenario graph
-$G_s=(V_s,E_s)$; the optimization experiments use $G_s^T$.
+$G_s=(V_s,E_s)$; the principal optimization experiments use $G_s^D$.
 
 Let $x_{sk}$ indicate whether cell $k$ burns. We use the convention
 $\bar y_{sj}=y_j$ if $j\in C\setminus\{r_s\}$, and
@@ -30,22 +30,22 @@ so treating $\bar y_{sr_s}$ as zero is equivalent to the implementation's
 arc expression for the purpose of the optimum.
 
 The empirical loss of a placement in the optimization representation is
-$L(y)=\sum_s\rho_s Q_s^T(y)$. To represent the upper tail, let
+$L(y)=\sum_s\rho_s Q_s^D(y)$. To represent the upper tail, let
 $\beta\in(0,1)$ be a confidence level. For finite scenario probabilities,
 the Rockafellar--Uryasev representation is
 \begin{equation}\label{eq:cvar}
- \operatorname{CVaR}_{\beta}(Q^T(y))
+ \operatorname{CVaR}_{\beta}(Q^D(y))
  =\min_{t\in\mathbb R}
  \left\{t+\frac{1}{1-\beta}
-       \sum_{s\in\mathcal S}\rho_s[Q_s^T(y)-t]^+\right\},
+       \sum_{s\in\mathcal S}\rho_s[Q_s^D(y)-t]^+\right\},
  \qquad [a]^+=\max\{a,0\}.
 \end{equation}
 The parameter $\lambda\in[0,1]$ interpolates between the mean and this
 tail measure. The risk objective is
 \begin{equation}\label{eq:risk}
  \min_{y\in\mathcal Y}
-  (1-\lambda)\sum_s\rho_s Q_s^T(y)
-       +\lambda\operatorname{CVaR}_{\beta}(Q^T(y)).
+  (1-\lambda)\sum_s\rho_s Q_s^D(y)
+       +\lambda\operatorname{CVaR}_{\beta}(Q^D(y)).
 \end{equation}
 Expected loss uses $\lambda=0$, pure CVaR uses $\lambda=1$, and an
 interior value gives mean--CVaR. In every case, the same first-stage

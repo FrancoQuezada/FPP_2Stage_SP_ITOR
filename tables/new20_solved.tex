@@ -1,0 +1,26 @@
+\begin{tabular}{llrrrr}
+\toprule
+Objective & Method & $n=100$ & $n=200$ & $n=400$ & Total \\
+\midrule
+Expected & Extensive SAA & 15 & 15 & 12 & 42 \\
+Expected & LP B\&B + Root & 10 & 10 & 6 & 26 \\
+Expected & LP B\&B + Standard & 10 & 10 & 6 & 26 \\
+Expected & LP B\&B + Coverage-exp & 15 & 12 & 7 & 34 \\
+Expected & LP B\&B + Path-exp & 15 & 14 & 10 & 39 \\
+Expected & Combinatorial B\&B & 14 & 14 & 15 & 43 \\
+\midrule
+CVaR & Extensive SAA & 6 & 0 & 0 & 6 \\
+CVaR & LP B\&B + Root & 5 & 5 & 5 & 15 \\
+CVaR & LP B\&B + Standard & 6 & 5 & 5 & 16 \\
+CVaR & LP B\&B + Coverage-exp & 8 & 6 & 5 & 19 \\
+CVaR & LP B\&B + Path-exp & 9 & 7 & 5 & 21 \\
+CVaR & Combinatorial B\&B & 8 & 6 & 5 & 19 \\
+\midrule
+Mean--CVaR & Extensive SAA & 10 & 3 & 0 & 13 \\
+Mean--CVaR & LP B\&B + Root & 5 & 5 & 5 & 15 \\
+Mean--CVaR & LP B\&B + Standard & 7 & 5 & 5 & 17 \\
+Mean--CVaR & LP B\&B + Coverage-exp & 9 & 8 & 5 & 22 \\
+Mean--CVaR & LP B\&B + Path-exp & 14 & 11 & 5 & 30 \\
+Mean--CVaR & Combinatorial B\&B & 7 & 9 & 5 & 21 \\
+\bottomrule
+\end{tabular}

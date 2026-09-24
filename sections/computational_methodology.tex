@@ -1,134 +1,131 @@
-\section{Computational methodology and evidence protocol}
+\section{Computational methodology and provenance}
 \label{sec:computational}
 
-The computational design has two separate purposes. First, it compares
-exact methods for the tree-based stochastic optimization problem. Second,
-it assesses a tree-optimized placement on the paired original propagation
-graphs. This section documents the inputs and settings specified by the
-current implementation. Because the available repository snapshot does not
-contain nonempty final run files, those settings describe a reproducible
-\emph{configured protocol}, not a verified completed experiment.
+We distinguish the \texttt{fpp\_new20x20\_scaling} campaign from the
+\texttt{fpp\_projected\_llbi\_scaling} campaign on \texttt{Sub20}. The
+principal numerical panel uses only the reduced \texttt{new20x20} rows of
+the first campaign. Its Reburn rows are incomplete and cannot be used as
+a paired evaluation. The second campaign is reported separately because
+it uses another landscape, different samples and additional methods.
+For reproducibility, the counts and tables in this article can be
+reconstructed by \texttt{analysis/reproduce\_results.py} from the
+committed batch files in the implementation repository.
 
-\subsection{Instances, samples and settings}
+\subsection{Recorded design and graph classification}
 
-The current instance configuration names a reduced 20-by-20 landscape
-and its Reburn pair (\texttt{new20x20}), and a reduced 40-by-40
-landscape and its Reburn pair (\texttt{new40x40}). Their declared sizes
-are 400 and 1,600 cells. It also names a 10,000-cell pair, but the repository's
-preflight documentation flags that pair's metadata as inconsistent; it
-must not enter the reported comparison without correction. Source Cell2Fire
-message files and per-scenario arc lists are absent from the repository
-snapshot. In particular, the realized rooted-tree property and exact
-paired arc inclusion still require an instance-level validation on the
-input files used for a final experiment.
+The \texttt{new20x20} manifest declares a 400-cell landscape,
+$\alpha\in\{0.01,0.02,0.03\}$, four training sample sizes
+$n\in\{100,200,400,800\}$ and five replications per configuration.
+It includes both \texttt{shortest\_path} and \texttt{reburn\_all\_paths}
+inputs, each with three objectives and six methods per objective: 2,160
+planned runs in all. For every recorded method comparison within an
+instance, budget, objective and replication, the manifest specifies the
+same training and test split files. Training identifiers are drawn from
+1--9000 and the fixed 1,000 test identifiers are 9001--10000. The
+recorded solver limit is 1,800 seconds, requested relative MIP gap
+$10^{-3}$ and one thread. CVaR uses $\beta=0.9$; mean--CVaR uses
+$\lambda=0.5$. These are manifest settings, not inferences from the
+launcher's defaults. The committed result contains only $n=100,200,400$
+for the reduced landscape; no $n=800$ solve is claimed.
 
-The full experiment launcher defaults to 100 and 200 training scenarios,
-five samples for \texttt{new40x40}, and the focused launcher to 100 training
-scenarios and ten samples for \texttt{new20x20}. Training IDs are drawn without
-replacement from 1--9000; the prescribed independent test set is the
-fixed set of IDs 9001--10000. Within a sample, all compared methods must
-receive identical training and test ID files. The launcher budgets use
-$\alpha\in\{0.01,0.02,0.03\}$, a 1,800-second time limit, a requested
-relative gap of $10^{-3}$, and one solver thread. For CVaR, the
-configuration specifies $\beta=0.9$; the mixed objective additionally
-sets $\lambda=0.5$. By default the weight map is homogeneous, so a unit
-loss counts burned cells. The solver build configuration points to IBM
-ILOG CPLEX Studio 22.1.1, but the version actually used by a run, its
-hardware and operating system must be read from the final run provenance.
+The preflight file reports graph classes for 10,000 reduced
+\texttt{20x20} scenario IDs: 12.41\% rooted arborescences, 86.83\%
+acyclic DAGs that are not trees, and 0.76\% empty or invalid. The
+corresponding Reburn ratios include 94.26\% general directed graphs.
+These classifications refer to the preflight output, not to independent
+reconstruction from the unavailable \texttt{new\_instances/20x20} and
+\texttt{new\_instances/20x20\_reburn} arc and ignition files. In
+particular, identical cell sets and ignition IDs, and the purported
+reduced-to-Reburn arc inclusion, have not been independently checked.
+The tree-only identity \eqref{eq:tree-equality} therefore cannot explain
+the performance of the predominantly DAG reduced panel in general.
 
-The focused 20x20 launcher uses a smoke-method subset by default, whereas
-the full method file enumerates the complete comparison. Thus, combining
-outputs of the two launchers without checking method coverage would
-produce unmatched panels. Likewise, script defaults alone do not certify
-which samples, weights or options were executed. Every comparison in
-Section~\ref{sec:results} must be keyed by landscape, scenario IDs,
-replication, $\alpha$, risk settings, weight map, time limit and requested
-gap, with missing or duplicate runs reported rather than silently pooled.
+The separate \texttt{Sub20} manifest contains 1,440 runs on a Canadian
+FBP landscape: the same three budgets, $n=100,200,400,800$, five
+replications, three objectives and eight methods per objective. It has
+200 test scenarios per run, the same 1,800-second limit, $10^{-3}$
+requested gap and one thread. Its run-level graph classifications also
+include many DAGs. Neither its test set nor its results are pooled with
+\texttt{new20x20}. No completed \texttt{new40x40} run is in the two
+campaigns under analysis.
 
-\subsection{Compared exact methods}\label{sec:compared}
+\subsection{Compared methods and measurements}\label{sec:compared}
 
-The full method file gives seven configurations per risk objective, for
-21 labels in total. Table~\ref{tab:methods} identifies the differences
-that matter scientifically. The LP-dual baseline with \texttt{RootCuts} uses
-one root user-cut round; projected families additionally use a configured
-maximum of 100 root separation rounds and 100 projected cuts per round,
-with violation tolerance $10^{-3}$. These are limits, not guaranteed
-counts of rounds or cuts. Standard LLBI is an initial scenario inequality;
-the projected exponential variants generate their structural cuts at the
-root. Every LP-dual configuration retains integer-candidate optimality
-separation. Neither projected polynomial method is present in this full
-campaign method file, although both help explain the bound relationships
-in Section~\ref{sec:methods}.
+Table~\ref{tab:methods} lists the six configurations per objective in
+the \texttt{new20x20} manifest (18 labels). \texttt{RootCuts} uses
+LP-dual root user cuts in addition to lazy optimality cuts at integer
+candidates. The standard LLBI is an initial structural inequality;
+\texttt{exp} denotes root separation of the projected family. The
+manifest records up to ten projected separation rounds and 100 cuts per
+round, with a $10^{-6}$ violation tolerance. These are configured
+ceilings and do not assert that each run attained them. The path
+separator enumerates a limited number of paths per node (default eight
+in the implementation); the manifest does not record a per-run override
+of that path cap. The combinatorial method has its own cut construction
+and candidate checks; its 0.10 initial sampling fraction does not allow
+an unchecked candidate to be accepted. The panel has one combinatorial
+ordering and has no projected \texttt{poly} variants.
 
 \begin{center}
 \begin{minipage}{0.97\linewidth}\centering\small
-\captionof{table}{Exact method configurations in the supplied full method file.
-Each row is specified separately for expected loss, pure CVaR and
-mean--CVaR. \texttt{Root} denotes LP-dual user-cut separation at the root;
-\texttt{candidate} denotes lazy optimality separation at integer solutions.
-The table specifies a protocol and does not report completed runs.}
+\captionof{table}{Methods actually present for each of the three risk
+objectives in the reduced \texttt{new20x20} panel. \texttt{Sub20} adds
+Coverage-poly and Path-poly and is analyzed separately.}
 \label{tab:methods}
-\begin{tabular}{p{0.27\linewidth}p{0.61\linewidth}}
+\begin{tabular}{p{0.42\linewidth}p{0.48\linewidth}}
 \toprule
-Displayed name & Model and strengthening \\
+Displayed name & Configuration \\
 \midrule
-Extensive MIP & Direct scenario formulation with binary burn variables. \\
-LP B\&B + Root & LP-dual candidate cuts and one root user-cut round. \\
-LP B\&B + Standard & Same, with the initial standard LLBI. \\
-LP B\&B + Coverage & Same, with separated projected CoverageLLBI-exp at the root. \\
-LP B\&B + Path & Same, with separated projected PathLLBI-exp over stored paths at the root. \\
-Combinatorial B\&B (asc.) & Combinatorial candidate cuts; initial/fractional cuts, heuristic lifting and initial scenario sampling; ascending loss-estimate inspection. \\
-Combinatorial B\&B (desc.) & Same combinatorial settings, descending inspection order. \\
+Extensive SAA & Binary-burn extensive MIP. \\
+LP B\&B + Root & LP-dual candidate and root cuts. \\
+LP B\&B + Standard & Root cuts and initial standard LLBI. \\
+LP B\&B + Coverage-exp & Root cuts and projected coverage separation. \\
+LP B\&B + Path-exp & Root cuts and projected stored-path separation. \\
+Combinatorial B\&B & Combinatorial candidate cuts and configured initial and fractional cuts. \\
 \bottomrule
 \end{tabular}
 \end{minipage}
 \end{center}
 
-The combinatorial variants use the distinct cut construction implemented
-for graph propagation and motivated by the network-spread Benders work of
-\citet{taninmics2024benders}. Their initial scenario inspection fraction
-is 0.10; uninspected scenarios are checked before accepting an integer
-candidate, preserving the exact acceptance rule. Their ascending or
-descending order affects computational work, not the finite-scenario
-objective. These variants do not inherit the LP-dual baseline's root-cut
-setting. No method's superiority is implied by the presence of a
-strengthening feature; its effect must be measured in matched runs.
+The \texttt{new20x20} consolidated file has 1,329 rows but a malformed
+132-column header: the last ten headings are blank, and fields from
+\texttt{selected\_firebreaks} onward are displaced. The individual
+worker CSV, JSON, solution files and intact full consolidated CSV named
+by the manifest are absent from the committed results. Thus our tables
+use only the uniquely named, verified fields \emph{before}
+\texttt{selected\_firebreaks}: identifiers, split and configuration
+metadata matched to the manifest, status, solver time, final gap and
+pre-existing cut diagnostics. They make no claim about the displaced
+placements, training or test evaluation fields, hardware or effective
+solver version. The separate \texttt{Sub20} consolidated file has a
+consistent 230-column header and explicit validation statuses.
 
-\subsection{Evaluation and reporting}\label{sec:evaluation}
+A status of \texttt{Optimal} with final relative gap at most $10^{-3}$
+is called \emph{resolved to the requested tolerance}, rather than a
+proof of zero gap. All \texttt{Feasible} observations are treated as
+time-limited for solver-time analyses; their recorded final gaps are
+reported separately. Any runtime ratio compares only the same instance,
+budget, training IDs, objective, solver limit and two methods that both
+reached the tolerance. Runs lacking certification do not enter a ratio.
+The fraction resolved by each time in Fig.~\ref{fig:new20-certified}
+uses a common denominator of 45 per objective and method; time-limited
+runs remain unresolved at the 1,800-second horizon.
 
-For each solved or time-limited tree model, let $y^T$ be its best
-available \emph{feasible} placement. Its in-sample tree loss is computed
-on the training IDs under $G_s^T$. In a second, paired calculation, the
-selected cells are transferred by original Cell2Fire cell identifier
-and $Q_s^R(y^T)$ is evaluated for those \emph{same} training IDs.
-For example, the empirical expected discrepancy is
+\subsection{Paired graph and held-out evaluation}\label{sec:evaluation}
+
+For a feasible reduced-graph placement $y^D$, the planned paired
+quantity on the \emph{same} scenario IDs is
 \begin{equation}\label{eq:paired-delta}
- \widehat\Delta_{\rm pair}(y^T)
+ \widehat\Delta_{\rm pair}(y^D)
    =\frac{1}{|\mathcal S_{\rm train}|}
      \sum_{s\in\mathcal S_{\rm train}}
-         \bigl(Q_s^R(y^T)-Q_s^T(y^T)\bigr).
+         \bigl(Q_s^R(y^D)-Q_s^D(y^D)\bigr).
 \end{equation}
-When the paired-graph assumptions hold, every summand is nonnegative.
-We retain the absolute discrepancy as the primary quantity, since a
-relative discrepancy would be undefined if Reburn loss were zero. The
-worker writes a separate paired-evaluation status; this status and the
-mapping completeness must be checked before using its numbers.
-
-Finally, the tree placement is evaluated on previously unused IDs
-9001--10000 under the \emph{tree} representation. This is the ordinary
-out-of-sample assessment; the paired training-ID evaluation is not an
-independent test. For a matched set of losses, expected loss, empirical
-VaR at $\beta=0.9$ and empirical CVaR defined by \eqref{eq:cvar}
-summarize average and upper-tail performance. With positive weights that
-are not all one, these are weighted-loss metrics; burned-cell counts
-must be reported separately.
-
-Optimization performance is reported through status, feasible objective,
-best lower bound, certified relative gap and elapsed wall time. A run at
-the requested gap is distinguished from a proven optimum, and a
-time-limited incumbent is never labeled optimal. The principal paired
-method comparisons use solved count, final gap, root bound, B\&B nodes,
-cut counts and time where present; a mean runtime over all runs must
-account explicitly for censored runs. Numerical tables also require
-the executed solver version, hardware, actual weight map, complete
-manifest and final nonempty run files.
+Its sign is predicted by Proposition~\ref{prop:reduction} only after
+the graph-pair premises have been verified. The current reduced and
+Reburn training partitions differ in all 60 corresponding
+$(\alpha,n,\text{case})$ combinations, despite sharing the fixed test
+set. Their independently optimized objectives cannot be substituted
+for \eqref{eq:paired-delta}. The displaced placement and evaluation
+fields and absent scenario inputs further preclude paired and held-out
+loss estimates in the present revision.

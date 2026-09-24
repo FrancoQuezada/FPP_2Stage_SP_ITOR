@@ -4,6 +4,10 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18}
+\usepackage{placeins}
 \usepackage{capt-of}
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
@@ -38,19 +42,21 @@
 \begin{abstract}
 Firebreak placement under uncertain ignition and propagation is a stochastic
 network decision problem. Directed Cell2Fire scenario graphs retain alternative
-fire routes but make optimization with many scenarios costly. We consider a
-rooted shortest-path tree of each original Reburn graph for optimization,
-followed by evaluation of the selected placement on its paired original
-graph. The scenario recourse is characterized by reachability, giving an
-optimal binary burn vector and relatively complete recourse. We derive
-downstream, capped-coverage and propagation-path lower bounds and show that
-the complete coverage and path projections coincide with fractional recourse
-on rooted trees. An exact Branch-and-Benders implementation supports expected
-loss, CVaR and mean--CVaR; a matched evaluation protocol separates solver
-performance, paired graph discrepancy and out-of-sample behavior. The
-repository snapshot available for this revision has no nonempty final run
-data, so the computational benefit and decision quality of the reduction
-remain empirical questions.
+fire routes but make optimization with many scenarios costly. We optimize
+on reduced shortest-path graphs, predominantly directed acyclic graphs
+rather than trees. Scenario recourse is characterized by reachability,
+giving an optimal integral burn vector and relatively complete recourse.
+We derive downstream, capped-coverage and propagation-path lower bounds:
+the complete path family recovers fractional recourse on directed graphs,
+and complete coverage coincides with it on rooted trees. The matched
+reduced 20-by-20 panel has 810 runs under expected loss, CVaR and
+mean--CVaR. At a 1,800-second limit and requested relative gap $10^{-3}$,
+projected PathLLBI reaches the tolerance in 39, 21 and 30 of 45 cases
+per objective, versus 26, 15 and 15 for the LP-dual root baseline.
+A separate 1,440-run Sub20 campaign compares polynomial and separated
+inequalities. Incomplete Reburn data, displaced placement/evaluation
+fields and missing original scenario graphs prevent a validated
+reduced/Reburn loss comparison or claim about placement quality.
 \end{abstract}
 
 \begin{keywords}

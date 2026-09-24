@@ -26,17 +26,18 @@ realization. Multiple directed routes can reach the same cell. We take
 $V_s$ to consist of the cells reachable from $r_s$ before treatment; other
 landscape cells contribute zero to this scenario's loss.
 
-Our optimization representation is a rooted shortest-path spanning tree
-$G_s^T=(V_s,E_s^T)$ extracted from $G_s^R$. The tree has the same ignition
-and cells, but selects one directed ignition-to-cell route, so that
-$E_s^T\subseteq E_s^R$ and every $k\in V_s$ has a unique path from $r_s$.
-Arc costs and tie breaking used to construct a particular data set do not
-enter the results below; its essential properties are spanning, rooting,
-and arc inclusion. Retaining only one route reduces the propagation
-structure and permits efficient graph-specific bounds. It also removes
-alternative routes that may carry fire around a selected break.
+The input labeled \texttt{shortest\_path} supplies the reduced graph
+$G_s^D=(V_s^D,E_s^D)$ for optimization. The label alone does not establish
+that this graph is a shortest-path \emph{tree}: the campaign's preflight
+classifies most nonempty reduced scenarios as directed acyclic graphs
+with multiple routes. We therefore call it the \emph{reduced
+shortest-path graph}. Its actual arc construction and paired relation to
+$G_s^R$ require inspection of the scenario input files, which are not
+included in the committed experiment. We do not presume that every
+reduced and Reburn pair has identical cells, weights and ignition, or
+that $E_s^D\subseteq E_s^R$; those are explicit premises where needed.
 
-For $g\in\{T,R\}$, delete each selected non-ignition cell from $G_s^g$
+For $g\in\{D,R\}$, delete each selected non-ignition cell from $G_s^g$
 for purposes of propagation, but retain $r_s$ even if selected. Write
 $R_s^g(y)$ for the cells then reachable from $r_s$ and define the realized
 loss by
@@ -44,33 +45,31 @@ loss by
  Q_s^g(y)=\sum_{k\in R_s^g(y)}w_k.
 \end{equation}
 The optimization in this paper minimizes risk measures formed from
-$Q_s^T(y)$. Evaluation on $Q_s^R(y)$ transfers the \emph{same} placement
-back to the paired original graph. A separate sample of unused scenario
-identifiers, if available, gives a distinct out-of-sample assessment.
+$Q_s^D(y)$. A valid paired evaluation would transfer the \emph{same}
+placement and scenario identifiers to $Q_s^R(y)$. A separate sample of
+unused scenario identifiers gives a distinct out-of-sample assessment.
 
 \begin{proposition}[Monotonicity of graph reduction]\label{prop:reduction}
-If $G_s^T$ and $G_s^R$ have the same cells, ignition, weights and treatment
-convention, and $E_s^T\subseteq E_s^R$, then for every $y\in\mathcal Y$,
+If $G_s^D$ and $G_s^R$ have the same cells, ignition, weights and treatment
+convention, and $E_s^D\subseteq E_s^R$, then for every $y\in\mathcal Y$,
 \begin{equation}\label{eq:graph-monotonicity}
- R_s^T(y)\subseteq R_s^R(y)
- \quad\text{and}\quad Q_s^T(y)\le Q_s^R(y).
+ R_s^D(y)\subseteq R_s^R(y)
+ \quad\text{and}\quad Q_s^D(y)\le Q_s^R(y).
 \end{equation}
 Consequently, the expected loss and every monotone risk measure, including
-CVaR, of the tree-loss vector do not exceed those of the Reburn-loss vector
+CVaR, of the reduced-loss vector do not exceed those of the Reburn-loss vector
 for this same placement.
 \end{proposition}
 \begin{proof}
 Deleting the same selected non-ignition nodes from both graphs preserves
-arc inclusion. Every remaining tree path is therefore a Reburn path.
+arc inclusion. Every remaining reduced-graph path is therefore a Reburn path.
 Inclusion of the reachable sets follows, and summing nonnegative weights
 gives the loss inequality. Expectation and CVaR are monotone under
 componentwise loss domination.
 \end{proof}
 
-Proposition~\ref{prop:reduction} identifies the direction of the
-approximation: tree propagation gives an optimistic assessment of a given
-placement. It does \emph{not} imply that a placement optimal for the tree
-problem is optimal for the Reburn problem, nor does it bound the difference
-between those two optima without additional information. The paired
-evaluation is designed to measure the discrepancy at the placements
-actually selected by the tree model.
+Proposition~\ref{prop:reduction} gives conditional monotonicity for a
+fixed placement on matched graphs, including DAG reductions. It does
+\emph{not} establish arc inclusion for the present files or imply that
+a reduced-graph optimizer solves the Reburn problem. The unavailable
+paired evaluation is needed to quantify any discrepancy.

@@ -1,0 +1,26 @@
+\begin{tabular}{llrrrr}
+\toprule
+Objective & Method & Unsolved & Median gap (\%) & Paired & Time ratio \\
+\midrule
+Expected & Extensive SAA & 3 & 10.16 & 23 & 3.22 \\
+Expected & LP B\&B + Root & 19 & 11.78 & 26 & 1.00 \\
+Expected & LP B\&B + Standard & 19 & 12.48 & 26 & 0.87 \\
+Expected & LP B\&B + Coverage-exp & 11 & 3.85 & 26 & 0.61 \\
+Expected & LP B\&B + Path-exp & 6 & 7.45 & 26 & 0.33 \\
+Expected & Combinatorial B\&B & 2 & 3.54 & 26 & 0.94 \\
+\midrule
+CVaR & Extensive SAA & 39 & 14.73 & 5 & 53.64 \\
+CVaR & LP B\&B + Root & 30 & 18.30 & 15 & 1.00 \\
+CVaR & LP B\&B + Standard & 29 & 19.60 & 15 & 0.79 \\
+CVaR & LP B\&B + Coverage-exp & 26 & 8.45 & 15 & 0.94 \\
+CVaR & LP B\&B + Path-exp & 24 & 6.46 & 15 & 0.61 \\
+CVaR & Combinatorial B\&B & 26 & 8.39 & 15 & 4.57 \\
+\midrule
+Mean--CVaR & Extensive SAA & 32 & 7.60 & 7 & 29.94 \\
+Mean--CVaR & LP B\&B + Root & 30 & 13.02 & 15 & 1.00 \\
+Mean--CVaR & LP B\&B + Standard & 28 & 16.75 & 15 & 0.89 \\
+Mean--CVaR & LP B\&B + Coverage-exp & 23 & 6.67 & 15 & 1.32 \\
+Mean--CVaR & LP B\&B + Path-exp & 15 & 6.14 & 15 & 0.76 \\
+Mean--CVaR & Combinatorial B\&B & 24 & 7.07 & 14 & 4.01 \\
+\bottomrule
+\end{tabular}
