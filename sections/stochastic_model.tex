@@ -1,0 +1,110 @@
+\section{Two-stage stochastic formulation}\label{sec:model}
+
+The placement is chosen before scenario $s$ is observed. Afterwards, fire
+propagates along the directed arcs of $G_s^T$ and incurs the loss in
+\eqref{eq:loss}. This is a two-stage problem in the decision-theoretic
+sense: the second-stage burn states are determined by the first-stage
+placement and the realized graph, with no additional treatment decision.
+We first give a formulation for a generic scenario graph
+$G_s=(V_s,E_s)$; the optimization experiments use $G_s^T$.
+
+Let $x_{sk}$ indicate whether cell $k$ burns. We use the convention
+$\bar y_{sj}=y_j$ if $j\in C\setminus\{r_s\}$, and
+$\bar y_{sj}=0$ otherwise. A feasible propagation state satisfies
+\begin{subequations}\label{eq:propagation}
+\begin{align}
+ x_{sr_s}&=1,\label{eq:ignite}\\
+ x_{si}-x_{sj}&\le\bar y_{sj}
+       &&((i,j)\in E_s),\label{eq:arcs}\\
+ 0\le x_{sk}&\le1 &&(k\in V_s).\label{eq:burn-domain}
+\end{align}
+\end{subequations}
+Thus, if $i$ burns and $j$ is not a selected non-ignition firebreak,
+$j$ must burn. The implemented extensive model declares $x$ binary;
+the linear scenario subproblem relaxes $x$ to the interval in
+\eqref{eq:burn-domain}. No explicit upper bound forcing a selected
+cell's burn variable to zero is needed to obtain the correct minimum loss:
+the minimum reachable-set vector has that property, as proved below.
+Incoming arcs to an eligible ignition cannot change its fixed burn state,
+so treating $\bar y_{sr_s}$ as zero is equivalent to the implementation's
+arc expression for the purpose of the optimum.
+
+The empirical loss of a placement in the optimization representation is
+$L(y)=\sum_s\rho_s Q_s^T(y)$. To represent the upper tail, let
+$\beta\in(0,1)$ be a confidence level. For finite scenario probabilities,
+the Rockafellar--Uryasev representation is
+\begin{equation}\label{eq:cvar}
+ \operatorname{CVaR}_{\beta}(Q^T(y))
+ =\min_{t\in\mathbb R}
+ \left\{t+\frac{1}{1-\beta}
+       \sum_{s\in\mathcal S}\rho_s[Q_s^T(y)-t]^+\right\},
+ \qquad [a]^+=\max\{a,0\}.
+\end{equation}
+The parameter $\lambda\in[0,1]$ interpolates between the mean and this
+tail measure. The risk objective is
+\begin{equation}\label{eq:risk}
+ \min_{y\in\mathcal Y}
+  (1-\lambda)\sum_s\rho_s Q_s^T(y)
+       +\lambda\operatorname{CVaR}_{\beta}(Q^T(y)).
+\end{equation}
+Expected loss uses $\lambda=0$, pure CVaR uses $\lambda=1$, and an
+interior value gives mean--CVaR. In every case, the same first-stage
+placements and scenario-loss functions are used; only the aggregation of
+losses changes \citep{rockafellar2000optimization}.
+
+For completeness, introducing nonnegative excess variables $z_s$ yields
+the extensive finite-sample formulation
+\begin{subequations}\label{eq:extensive}
+\begin{align}
+ \min_{y,x,t,z}\quad &(1-\lambda)
+        \sum_s\rho_s\sum_{k\in V_s}w_kx_{sk}
+       +\lambda\left(t+\frac{1}{1-\beta}
+               \sum_s\rho_sz_s\right)\label{eq:ext-obj}\\
+ \text{s.t.}\quad &y\in\mathcal Y,\label{eq:ext-budget}\\
+ &x_{sr_s}=1 &&(s\in\mathcal S),\label{eq:ext-ignition}\\
+ &x_{si}-x_{sj}\le\bar y_{sj}
+       &&(s\in\mathcal S,\ (i,j)\in E_s),\label{eq:ext-graph}\\
+ &z_s\ge\sum_{k\in V_s}w_kx_{sk}-t,
+       \quad z_s\ge0 &&(s\in\mathcal S),\label{eq:ext-tail}\\
+ &x_{sk}\in\{0,1\} &&(s\in\mathcal S,\ k\in V_s),
+       \qquad t\in\mathbb R.\label{eq:ext-domains}
+\end{align}
+\end{subequations}
+For $\lambda=0$, the $t,z$ variables and their constraints can be
+omitted. The displayed formulation allows $t$ to be unrestricted, whereas
+the extensive implementation bounds it between zero and a valid maximum
+scenario loss. Those bounds retain an optimum because scenario losses are
+nonnegative and bounded.
+
+Fix $s$ and a binary $y\in\mathcal Y$. The scenario recourse LP minimizes
+$\sum_{k\in V_s}w_kx_{sk}$ subject to
+\eqref{eq:propagation}. Write its value as $q_s(y)$.
+This recourse model has a particularly simple graph interpretation.
+
+\begin{proposition}[Reachability and relatively complete recourse]
+\label{prop:recourse}
+For every feasible binary placement and every finite directed scenario
+graph, the recourse LP is feasible and bounded. The indicator vector of
+$R_s(y)$ is feasible and componentwise no larger than any other feasible
+burn vector. Hence it is an optimal binary solution,
+$q_s(y)=Q_s(y)$, and the model has relatively complete recourse.
+\end{proposition}
+\begin{proof}
+The indicator of the reachable set has value one at the ignition.
+If $(i,j)$ is an arc with a reachable tail and an unselected non-ignition
+head, then $j$ is reachable; thus its propagation constraint holds.
+All other arc constraints are immediate. Conversely, starting with
+$x_{sr_s}=1$ and applying \eqref{eq:arcs} along any unblocked
+ignition-to-$k$ path forces $x_{sk}=1$ for every reachable $k$.
+The indicator is therefore componentwise minimal among feasible points;
+nonnegative weights make it optimal. It has finite loss at most
+$\sum_{k\in V_s}w_k$, establishing boundedness and recourse feasibility
+for every first-stage feasible placement.
+\end{proof}
+
+Proposition~\ref{prop:recourse} justifies the scenario LP used in Benders
+decomposition, even though the extensive implementation uses binary burn
+variables. It also explains why one needs optimality cuts but no recourse
+feasibility cuts. With zero-weight cells the LP may have other, nonminimal
+optimal solutions; the reachable-set indicator still gives an optimal
+solution with the intended physical interpretation.

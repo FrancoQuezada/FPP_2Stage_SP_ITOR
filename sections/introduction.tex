@@ -1,0 +1,72 @@
+\section{Introduction}\label{sec:introduction}
+
+Firebreaks interrupt the spread of fire through a landscape, but their
+effect depends on where a future fire starts and which propagation routes
+it follows. Their placement must therefore be decided before much of the
+relevant information is known. Fuel-treatment planning has long used
+spatial optimization, and two-stage stochastic models provide a way to
+represent uncertain fire behavior explicitly
+\citep{agee2000use,kabli2015stochastic}. A sampled wildfire scenario is
+particularly useful when it preserves the geography of a simulated fire
+rather than representing risk by independent cell scores.
+
+Cell2Fire generates spatially explicit fire realizations that can support
+planning decisions \citep{pais2021cell2fire}; network measures such as
+downstream protection value have also been used to identify potentially
+important treatment locations \citep{pais2021downstream}. When a
+simulated realization is represented by a directed propagation graph,
+several routes may lead to the same cell. Keeping these alternatives
+matters when assessing a proposed firebreak: blocking one route need
+not protect a cell that can be reached through another. The same graph
+complexity, however, makes a stochastic optimization model with many
+scenarios difficult to solve. A method that simplifies propagation
+must therefore be judged both by its computational value and by the
+quality of the resulting decisions under the original propagation
+representation.
+
+We investigate this trade-off by constructing, for each original
+Reburn graph, a rooted shortest-path spanning tree on the same
+scenario cells. The trees are the \emph{optimization} scenarios. A
+firebreak placement selected on these scenarios is subsequently
+evaluated on its paired Reburn graphs, using the same ignitions and
+scenario identifiers. The reduction preserves an original route to
+each cell but can delete alternatives. It consequently gives an
+optimistic loss for any fixed placement. Paired Reburn evaluation
+measures the discrepancy introduced by the reduction; assessing
+placements on unused scenarios is a separate generalization test.
+
+The reduced stochastic problem remains a mixed-integer optimization
+problem: one treatment plan must work across many graph realizations
+and, under CVaR, across adverse outcomes. Branch-and-Benders separates
+the common treatment decisions from scenario propagation
+\citep{rahmaniani2017benders}. Root relaxations can still underestimate
+scenario loss while their recourse cuts are incomplete. We exploit
+graph structure to supply valid lower estimates based on downstream
+reachability, capped cell coverage and explicit ignition-to-cell paths.
+The relationship among these estimates is particularly sharp on trees,
+where every cell has one ignition path. Combinatorial Benders for
+network spread provides a separate exact methodological comparator
+\citep{taninmics2024benders}.
+
+This paper makes four precise methodological contributions. It
+formulates expected-loss and upper-tail stochastic firebreak placement
+on reduced propagation graphs while separating paired original-graph
+evaluation from independent testing. It characterizes scenario recourse
+by reachability, establishing an optimal integral burn vector and
+relatively complete recourse. It derives downstream, coverage and path
+lower bounds, including projected families and a proof that the
+complete coverage and path envelopes coincide with fractional recourse
+on rooted trees. Finally, it integrates these bounds into an exact
+Branch-and-Benders implementation and specifies a matched evaluation
+protocol for optimization and graph-reduction quality. The repository
+snapshot supplied for this revision does not contain completed numerical
+runs, so the paper draws no empirical performance conclusion.
+
+Section~\ref{sec:setting} defines the graph reduction and its
+consequence for loss. Section~\ref{sec:model} gives the stochastic
+formulation and recourse analysis. Section~\ref{sec:methods} develops
+the exact decomposition and its structural inequalities.
+Section~\ref{sec:computational} states the verified experiment protocol;
+Section~\ref{sec:results} distinguishes analytical implications from
+currently unavailable run-level evidence. Section~\ref{sec:conclusions}
+summarizes the results and remaining empirical question.

@@ -1,0 +1,259 @@
+\section{Branch-and-Benders and graph-based inequalities}
+\label{sec:methods}
+
+The extensive model creates burn variables for every sampled cell and
+scenario. We instead retain the common placement in a master problem and
+estimate each scenario's recourse loss. Structural graph inequalities then
+raise those estimates before the full scenario LP has been processed.
+The graph results in this section apply to a finite directed graph unless
+the statement explicitly requires a rooted tree.
+
+\subsection{Exact decomposition}\label{sec:benders}
+
+Introduce a nonnegative master variable $\eta_s$ for the loss of scenario
+$s$. The remaining variables $t,z_s$ aggregate risk exactly as in
+\eqref{eq:extensive}. In particular, the master objective and risk
+constraints are
+\begin{equation}\label{eq:master}
+ \begin{aligned}
+ \min_{y\in\mathcal Y,\eta,t,z}\quad
+ &(1-\lambda)\sum_s\rho_s\eta_s
+   +\lambda\left(t+\frac{1}{1-\beta}\sum_s\rho_sz_s\right)\\
+ \text{s.t.}\quad
+ &z_s\ge\eta_s-t,\quad z_s\ge0,\quad\eta_s\ge0
+       &&(s\in\mathcal S),\qquad t\in\mathbb R.
+ \end{aligned}
+\end{equation}
+The missing constraints $\eta_s\ge Q_s(y)$ are supplied by Benders
+optimality cuts. If $\bar y\in[0,1]^C$, denote by $\overline Q_s(\bar y)$
+the value of the propagation LP \eqref{eq:propagation} with $y=\bar y$.
+The LP dual generates affine global underestimators
+\begin{equation}\label{eq:benders-cut}
+ \eta_s\ge \overline Q_s(\bar y)
+         +\sum_{i\in C}\pi_{si}(y_i-\bar y_i),
+\end{equation}
+where $\pi_s$ is the vector of multipliers of the rows fixing the
+subproblem's copies of $y$ to $\bar y$. The cut is tight at $\bar y$ and
+valid for all feasible placements. The implementation solves scenario LPs
+and adds violated cuts at integer candidate solutions through a callback;
+configured variants also add LP-dual user cuts at the root relaxation.
+Proposition~\ref{prop:recourse} makes the integer-candidate checks equal
+to the actual scenario losses. Thus, with exact subproblem solves and the
+stated solver tolerances, the candidate cuts support an exact
+branch-and-cut solution of the finite-scenario problem.
+
+The inequalities below concern individual scenario estimates $\eta_s$.
+They remain valid under expected loss, CVaR and mean--CVaR because those
+models change only the master risk aggregation. They strengthen the
+implemented search but do not replace its integer-candidate Benders
+checks. The theoretical equality of a \emph{complete} inequality family
+with recourse must not be confused with adding a limited number of root
+cuts \citep{rahmaniani2017benders}.
+
+\subsection{Downstream and capped-coverage bounds}
+\label{sec:coverage}
+
+Let $K_s=R_s(0)$ be the untreated reachable cells and
+$q_s^0=\sum_{k\in K_s}w_k$. For eligible $i\in C\cap
+(K_s\setminus\{r_s\})$, define its \emph{closed downstream set}
+$D_s(i)=\{k\in K_s:\text{there is a directed path from $i$ to $k$}
+\text{ in }G_s\}$. In particular $i\in D_s(i)$. For other eligible cells,
+put $D_s(i)=\varnothing$, and set
+$d_{si}=\sum_{k\in D_s(i)}w_k$. These are structural potential
+protection masses, not necessarily the actual losses avoided by one break
+in a graph with several routes.
+
+The \emph{standard lifted lower-bound inequality} (LLBI) is
+\begin{equation}\label{eq:standard}
+ \eta_s\ge L_s^{\rm std}(y):=
+           q_s^0-\sum_{i\in C}d_{si}y_i.
+\end{equation}
+Its construction is cheap once downstream sets have been computed, but
+several coefficients may count the same potentially protected cell.
+
+\begin{proposition}[Validity of the standard LLBI]
+\label{prop:standard}
+For every binary placement $y$, inequality \eqref{eq:standard} is valid.
+It is also valid below the fractional recourse function
+$\overline Q_s(y)$ for $y\in[0,1]^C$.
+\end{proposition}
+\begin{proof}
+If a cell $k\in K_s$ is no longer reachable under a binary placement,
+each original ignition-to-$k$ path meets a selected non-ignition cell.
+At least one such cell $i$ has $k\in D_s(i)$. Hence the protected cells
+lie in $\bigcup_{i:y_i=1}D_s(i)$, whose weight is at most
+$\sum_i d_{si}y_i$. This proves the first statement.
+For fractional $y$, sum the propagation constraints along any original
+ignition-to-$k$ path $p$ to obtain
+$x_{sk}\ge 1-\sum_{i\in C(p)}y_i$, where $C(p)$ is the eligible
+non-ignition part of the path. Every $i\in C(p)$ belongs to the set of
+candidates downstream of which $k$ lies. Therefore
+$x_{sk}\ge 1-\sum_{i\in A_{sk}}y_i$, where $A_{sk}$ is defined below.
+Summing the nonnegative-weight inequalities over $K_s$ yields
+\eqref{eq:standard} after interchanging the two sums.
+\end{proof}
+
+To avoid repeatedly counting potential protection of a cell, define
+\begin{equation}\label{eq:coverage-sets}
+ A_{sk}=\{i\in C\cap(K_s\setminus\{r_s\}): k\in D_s(i)\},
+ \qquad K_s^+=\{k\in K_s:A_{sk}\ne\varnothing\}.
+\end{equation}
+On a graph with alternative paths, $i\in A_{sk}$ means that $i$ \emph{can}
+lie upstream of $k$; it does not mean that treating $i$ alone prevents
+every route to $k$. For each $k\in K_s^+$, introduce
+$0\le\zeta_{sk}\le1$ and impose
+\begin{equation}\label{eq:coverage-ext}
+ \eta_s\ge q_s^0-\sum_{k\in K_s^+}w_k\zeta_{sk},
+ \qquad
+ \zeta_{sk}\le\sum_{i\in A_{sk}}y_i\quad(k\in K_s^+).
+\end{equation}
+The cap at one prevents the same cell from receiving more than its own
+weight in the bound.
+
+\begin{proposition}[Coverage projection and separation]
+\label{prop:coverage}
+For every $y\in[0,1]^C$, the strongest bound implied by
+\eqref{eq:coverage-ext} is
+\begin{equation}\label{eq:coverage-envelope}
+ L_s^{\rm cov}(y)=q_s^0-
+  \sum_{k\in K_s^+}w_k
+       \min\left\{1,\sum_{i\in A_{sk}}y_i\right\}
+ \le\overline Q_s(y).
+\end{equation}
+Its exact projection is the linear family
+\begin{equation}\label{eq:coverage-proj}
+ \eta_s\ge q_s^0-
+   \sum_{k\in K_s^+\setminus U}w_k
+   -\sum_{k\in U}w_k\sum_{i\in A_{sk}}y_i,
+ \quad U\subseteq K_s^+.
+\end{equation}
+At $\bar y$, a strongest member takes
+$U=\{k:\sum_{i\in A_{sk}}\bar y_i<1\}$, with either choice allowed at
+equality. Taking $U=K_s^+$ gives exactly \eqref{eq:standard}.
+\end{proposition}
+\begin{proof}
+The path argument in Proposition~\ref{prop:standard}, together with
+$x_{sk}\ge0$, gives
+$x_{sk}\ge[1-\sum_{i\in A_{sk}}y_i]^+$ for $k\in K_s^+$;
+for $k\notin K_s^+$ the same path argument gives $x_{sk}=1$.
+This proves the inequality in \eqref{eq:coverage-envelope}.
+For fixed $y$, maximizing each $\zeta_{sk}$ subject to
+\eqref{eq:coverage-ext} permits
+$\zeta_{sk}=\min\{1,\sum_{i\in A_{sk}}y_i\}$.
+Since $q_s^0-w_k\min\{1,a_k\}=
+\max\{q_s^0-w_k,q_s^0-w_ka_k\}$ cellwise for $w_k\ge0$,
+independent selections of the active term give the maximum of the
+right-hand sides of \eqref{eq:coverage-proj}. Finally,
+$\sum_{k\in K_s^+}w_k\sum_{i\in A_{sk}}y_i
+=\sum_i\sum_{k\in D_s(i)}w_ky_i=\sum_i d_{si}y_i$.
+\end{proof}
+
+We call the single static member $U=K_s^+$ CoverageLLBI-poly, and
+separation of the full family at root LP points CoverageLLBI-exp.
+The static projected member and the standard LLBI are identical when
+defined on the same scenario and candidate set. Their complete projected
+family can nevertheless improve the master bound through cellwise caps.
+
+\subsection{Propagation-path bounds}\label{sec:path}
+
+Coverage uses all candidates that might reach a cell. A complementary
+construction uses the actual routes along which a fire \emph{can} reach
+it. Let $\mathcal P_{sk}$ be all directed simple paths from $r_s$ to
+$k\in K_s$ and $\widehat{\mathcal P}_{sk}\subseteq\mathcal P_{sk}$
+the paths retained by an implementation. Put
+$C(p)=C\cap(V(p)\setminus\{r_s\})$; thus an eligible terminal cell
+belongs to $C(p)$, while the ignition never does. The trivial path to
+$r_s$ has $C(p)=\varnothing$. A path inequality
+\begin{equation}\label{eq:path-atom}
+ b_{sk}+\sum_{i\in C(p)}y_i\ge1,
+ \qquad p\in\widehat{\mathcal P}_{sk},\quad 0\le b_{sk}\le1,
+\end{equation}
+forces a lower estimate $b_{sk}$ of burning whenever that path is
+unblocked. Coupling the estimates by
+$\eta_s\ge\sum_{k\in K_s}w_kb_{sk}$ gives the extended PathLLBI.
+
+To describe the projection, allow the symbol $\bot$ to omit a cell from a
+cut, and let $\pi_k\in\widehat{\mathcal P}_{sk}\cup\{\bot\}$ be an
+independent choice. If $K(\pi)=\{k:\pi_k\ne\bot\}$, the resulting
+projected family is
+\begin{equation}\label{eq:path-proj}
+ \eta_s\ge\sum_{k\in K(\pi)}w_k
+       \left(1-\sum_{i\in C(\pi_k)}y_i\right)
+ \quad\left(\pi\in\prod_{k\in K_s}
+        (\widehat{\mathcal P}_{sk}\cup\{\bot\})\right).
+\end{equation}
+
+\begin{proposition}[Path projection and complete-path recourse]
+\label{prop:path}
+The extended PathLLBI and \eqref{eq:path-proj} define the same
+$(y,\eta_s)$ projection. Every member is valid below
+$\overline Q_s(y)$ for $y\in[0,1]^C$. If every simple path is retained,
+then this projection is exactly the epigraph of
+$\overline Q_s(y)$.
+\end{proposition}
+\begin{proof}
+Summing \eqref{eq:arcs} along a path proves
+$x_{sk}\ge1-\sum_{i\in C(p)}y_i$; $x_{sk}\ge0$ supplies the
+$\bot$ term. With nonnegative weights, the minimum feasible $b_{sk}$ is
+\[
+ \max\left\{0,\max_{p\in\widehat{\mathcal P}_{sk}}
+       \left(1-\sum_{i\in C(p)}y_i\right)\right\}.
+\]
+Maximizing independently over these terms for each $k$ yields
+\eqref{eq:path-proj}, and also proves validity. For completeness, with
+all paths retained define $d_k(y)=\min_{p\in\mathcal P_{sk}}
+\sum_{i\in C(p)}y_i$ and $x_{sk}^*=[1-d_k(y)]^+$.
+The trivial path gives $x_{sr_s}^*=1$. For each arc $(i,j)$,
+$d_j(y)\le d_i(y)+\bar y_{sj}$: appending the arc to a minimum-cost
+ignition-to-$i$ route gives a walk, and removing any nonnegative-cost
+cycles cannot increase its cost. Hence $x_{si}^*\le
+x_{sj}^*+\bar y_{sj}$; the bound also holds for arcs into the fixed
+ignition and arcs whose tail is unreachable. Thus $x^*$ satisfies the
+recourse LP and attains every cell's individual path lower bound.
+Summing with nonnegative weights proves equality with its value.
+\end{proof}
+
+Complete PathLLBI-exp would choose a minimum-cost path for each cell with
+$d_k(\bar y)<1$ when separating at a fractional point $\bar y$.
+The implemented projected separator instead selects a least-cost path
+among the paths it has \emph{stored} for each destination. It first
+enumerates up to a configured number of simple paths per cell, so its
+separation need not attain the complete-path envelope on a general
+graph. PathLLBI-poly keeps one deterministic first path per destination
+and one static projected cut. Both versions are valid because omitted
+paths weaken the bound; they do not create an invalid cut.
+
+\subsection{Bound relationships and the tree case}\label{sec:relationships}
+
+The relations explain what strengthening is mathematically possible and
+what a computation can instead reveal about implementation overhead.
+For $y\in[0,1]^C$, let $L_s^{\rm path}(y)$ denote the complete-path
+envelope. Then
+\begin{equation}\label{eq:hierarchy}
+ L_s^{\rm std}(y)\le L_s^{\rm cov}(y)
+          \le L_s^{\rm path}(y)=\overline Q_s(y).
+\end{equation}
+The first inequality follows since
+$\min\{1,a\}\le a$. For each path $p$ to $k$, its candidate set
+$C(p)$ is contained in $A_{sk}$; therefore
+$[1-\sum_{i\in A_{sk}}y_i]^+
+\le[1-\sum_{i\in C(p)}y_i]^+$. Summing cellwise with nonnegative
+weights proves the second inequality. Proposition~\ref{prop:path}
+gives equality at the right. These comparisons concern envelopes;
+a particular finite collection of cuts can produce weaker master bounds.
+
+On a rooted propagation tree each cell has one ignition path $p_{sk}$,
+and precisely its eligible non-ignition ancestors reach $k$. Thus
+$A_{sk}=C(p_{sk})$ and
+\begin{equation}\label{eq:tree-equality}
+ L_s^{\rm cov}(y)=L_s^{\rm path}(y)=\overline Q_s(y)
+ \qquad(y\in[0,1]^C).
+\end{equation}
+Moreover, the all-unsaturated coverage cut and the one-path-per-cell
+static path cut both equal the standard LLBI. Consequently, a runtime
+difference between separated CoverageLLBI and PathLLBI on actual trees
+cannot by itself demonstrate stronger \emph{complete} bounds. Finite
+separation, cut selection, construction time and solver interaction are
+distinct sources of computational differences. On a general Reburn graph,
+the complete path bound may be strictly stronger than complete coverage,
+but the principal experiments optimize trees.

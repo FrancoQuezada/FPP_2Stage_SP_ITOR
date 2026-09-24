@@ -1,0 +1,102 @@
+\section{Results and discussion}\label{sec:results}
+
+The distinction between mathematical predictions and measured performance
+is especially important here. The source snapshot contains the experiment
+scripts and solver implementation, but its result and manifest files are
+empty. We therefore first give a fully specified analytical check of the
+tree/Reburn distinction and then state the empirical comparisons that
+cannot yet be evaluated. No times, gaps or solution-quality gains are
+imputed from the scripts or from the superseded results section.
+
+\subsection{A constructed check of the reduction and bounds}
+
+Consider one unit-weight scenario with ignition $r$, eligible candidates
+$C=\{a,b\}$, and original arcs
+$E^R=\{(r,a),(r,b),(a,k),(b,k)\}$. A rooted shortest-path
+tree can choose $E^T=\{(r,a),(r,b),(a,k)\}$. For the placement selecting
+only $a$, the remaining tree burns $\{r,b\}$, whereas the original graph
+also burns $k$ through $b$. Thus $Q^T(y)=2$ and $Q^R(y)=3$.
+Table~\ref{tab:constructed} gives the resulting lower bounds, computed
+directly from the definitions in Section~\ref{sec:methods}.
+
+\begin{center}
+\begin{minipage}{0.97\linewidth}\centering\small
+\captionof{table}{Analytical four-cell example, with unit weights and
+$y_a=1,y_b=0$. Complete means that the entire projected family is
+available, not merely a selected root cut. These are constructed values,
+not measurements from the Cell2Fire experiment.}
+\label{tab:constructed}
+\begin{tabular}{lrrrr}
+\toprule
+Graph & Standard LLBI & Complete coverage & Complete path & Loss \\
+\midrule
+Rooted tree & 2 & 2 & 2 & 2 \\
+Original Reburn graph & 2 & 2 & 3 & 3 \\
+\bottomrule
+\end{tabular}
+\end{minipage}
+\end{center}
+
+On the original graph, treating $a$ can potentially cover $k$ but does
+not block the $r$--$b$--$k$ route. Complete PathLLBI accounts for that
+route and reaches the actual loss. On the tree the two complete envelopes
+coincide, as predicted by \eqref{eq:tree-equality}; the missing arc
+explains the one-cell paired loss increase. This example checks the
+direction and possible strictness of \eqref{eq:graph-monotonicity}, but
+it says nothing about the frequency or magnitude of such discrepancies
+in the intended landscapes.
+
+\subsection{Scalability and recourse strengthening}
+
+The first empirical question is whether graph inequalities help solve
+larger sampled tree models. The appropriate comparison is among
+methods matched on tree instance, training IDs, risk objective, weight
+map, treatment budget, tolerance and limit. For each group, a results
+table should show the number of certified solves and time-limited
+runs, paired runtime among jointly solved instances, and final gap for
+unsolved runs. Root bounds, cut counts and separation time can then
+help distinguish bound changes from the time spent obtaining them.
+
+There is an important theoretical constraint on interpreting that
+comparison. On verified rooted trees, complete CoverageLLBI and
+complete PathLLBI define the same fractional recourse bound. A different
+runtime between their implemented root separators would therefore
+reflect finite cut generation or computational behavior; it would not
+establish an ordering of their complete tree envelopes. Likewise, the
+static projected coverage and static one-path-per-cell cuts coincide
+with standard LLBI on a tree. The available files do not reveal whether
+any configuration reduced runtime, improved root bounds or solved more
+instances, so these outcomes remain open.
+
+\subsection{Paired Reburn loss and independent scenarios}
+
+The second empirical question is the price paid for deleting
+alternative propagation arcs. A valid paired analysis evaluates each
+tree-selected placement on its exact training IDs in both graphs,
+checks that selected original cell IDs and weights match, and reports
+\eqref{eq:paired-delta} alongside the paired expected and upper-tail
+losses. Proposition~\ref{prop:reduction} predicts the sign of each
+paired difference when arc inclusion is satisfied, but it places no
+useful upper limit on their aggregate size. A difference of zero would
+show only that the omitted routes do not change the loss for that
+placement and those scenarios.
+
+Independent test IDs answer a different question: how a placement
+trained on some realizations performs on unseen \emph{tree} scenarios.
+For each matched run, test mean and empirical CVaR can be compared with
+the corresponding training metrics. A strong in-sample objective or a
+small paired graph discrepancy does not alone establish generalization.
+The repository snapshot contains neither successful paired evaluations
+nor held-out losses, so no claim about transfer quality or risk
+performance can presently be made.
+
+\paragraph{Empirical evidence status.}
+The supplied implementation checkout records 6,390 files in
+\texttt{Results\_server}, of which none contains data; its 3,384 CSV files are
+also zero bytes. The \texttt{new\_instances} scenario inputs and a CPLEX-enabled
+executable are not included. Thus this manuscript gives a validated
+structural analysis, a verified description of the configured study and
+a constructed check, but \emph{not} a completed numerical assessment.
+The matched scalability and graph-reduction tables and figures must be
+generated from nonempty, provenance-checked final campaign files before
+empirical conclusions or a submission-ready abstract can be added.
