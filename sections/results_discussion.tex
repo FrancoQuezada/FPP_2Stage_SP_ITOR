@@ -49,29 +49,39 @@ tolerance, not mathematically exact zero gap.
 
 \begin{center}
 \begin{minipage}{0.98\linewidth}\centering\small
-\captionof{table}{Reduced \texttt{new20x20}: final relative MIP gap
-among runs \emph{not} resolved to tolerance, and matched solver-time
-ratio to LP B\&B + Root. \texttt{Unsolved} is out of 45; its median gap
-is computed only over that method's time-limited runs. \texttt{Paired}
-counts blocks where both this method and the root baseline reached
-tolerance. The last column is the median of this method's solver time
-divided by the root method's solver time on precisely those blocks;
-ratios above one indicate longer times on that restricted subset. The
-different unsolved subsets must not be compared as paired gaps.}
+\setlength{\tabcolsep}{3pt}
+\captionof{table}{Reduced \texttt{new20x20}: $N_{\rm opt}/N$, mean and
+maximum final relative MIP gap (\%), and mean observed solver time and
+sample standard deviation (s). Every statistic uses all 45 runs per
+objective and method, including time-limited runs at their recorded
+times and positive gaps within tolerance.}
 \label{tab:new20-gaps-times}
 \input{tables/new20_gaps_times}
 \end{minipage}
 \end{center}
 
-Table~\ref{tab:new20-gaps-times} prevents two misleading summaries:
-excluding non-certified runs from a pooled mean runtime, and treating
-their 1,800-second censoring time as a completed solve. For example,
-on the 15 CVaR cases jointly certified by Path-exp and Root, the
-median paired time ratio is 0.61; Path-exp also certifies six other
-CVaR cases that Root does not. The ratio therefore characterizes a
-restricted common-success subset. Final gaps document the cases still
-unresolved; their medians range across methods and objectives without
-implying a ranking on identical unsolved cases.
+Table~\ref{tab:new20-gaps-times} summarizes the same 45 cases for every
+method within an objective. Under expected loss, Combinatorial B\&B
+resolves 43/45, with mean and maximum gaps of 0.18\% and 4.00\% and
+observed time $212.4\pm427.1$\,s (mean $\pm$ sample SD). Path-exp
+resolves 39/45, with gaps of 0.95\% and 10.78\% and time
+$356.5\pm632.3$\,s. Extensive SAA resolves 42/45 and has a lower mean
+gap of 0.75\% than Path-exp, but its maximum gap is 21.79\% and its
+time is $409.8\pm545.8$\,s. Thus the mean gap alone conceals differences
+in the most difficult recorded cases.
+
+For CVaR, Path-exp resolves 21/45, with mean and maximum gaps of
+3.51\% and 12.40\%, versus 15/45 and 11.18\% and 26.60\% for Root.
+Their observed times are $1003.5\pm872.4$\,s and
+$1218.3\pm834.2$\,s. For mean--CVaR, Path-exp resolves 30/45 with
+gaps of 2.10\% and 10.86\% and time $813.1\pm824.9$\,s; Root
+resolves 15/45 with gaps of 8.75\% and 22.41\% and time
+$1217.2\pm836.4$\,s. These jointly reported measures support the
+observed computational advantage of Path-exp over Root on these risk
+objectives. The time statistics describe computation consumed under
+the stopping rule, not expected time to certification: time-limited
+runs remain censored, and their recorded times are retained even when
+they exceed the nominal 1,800-second limit.
 
 \begin{figure}[t]
 \centering
@@ -101,6 +111,72 @@ path set and these data also reflect construction cost, cut selection
 and solver interactions. The predominantly DAG classification means the
 tree equality \eqref{eq:tree-equality} is not a blanket explanation of
 the coverage/path timing difference.
+
+\FloatBarrier
+\subsection{Effect of the firebreak budget}\label{sec:alpha-results}
+
+Table~\ref{tab:new20-alpha-solved} conditions certification on the
+budget fraction $\alpha$. Each cell contains 15 runs: five replications
+at each of $n=100,200,400$. Tables~\ref{tab:alpha-Expected}--\ref{tab:alpha-MeanCVaR}
+in Appendix~\ref{app:alpha} provide the corresponding mean and maximum
+gaps and observed time means and sample standard deviations. The CVaR
+confidence level remains $\beta=0.9$; $\alpha$ changes the firebreak
+budget. These are empirical associations within this panel, not an
+isolated causal diagnosis of the solver's response to budget.
+
+\begin{center}
+\begin{minipage}{0.98\linewidth}\centering\small
+\captionof{table}{Reduced \texttt{new20x20}: $N_{\rm opt}/15$ by budget
+fraction, objective and method. Each column uses the same three
+training sizes and five replications.}
+\label{tab:new20-alpha-solved}
+\input{tables/new20_alpha_solved}
+\end{minipage}
+\end{center}
+
+For expected loss, Root and Standard fall from 15/15 at $\alpha=0.01$
+to 11/15 at 0.02 and 0/15 at 0.03. Root's mean gap increases from
+0.04\% to 0.86\% and 12.43\%, and its maximum from 0.10\% to
+4.80\% and 15.71\%. Its observed time increases from
+$21.7\pm15.5$\,s to $813.0\pm728.5$\,s and $1800.9\pm0.5$\,s.
+The declining certification and increasing mean gap, maximum gap and
+mean time also hold within each training size. The small final time
+SD reflects the common stopping limit. Extensive SAA shows a different
+pattern: 12/15, 15/15 and 15/15, with mean times of
+$578.0\pm705.3$\,s, $401.8\pm539.9$\,s and $249.5\pm298.8$\,s.
+Its certification gain comes entirely from $n=400$ (2/5, 5/5, 5/5);
+at $n=100$ and 200 all runs are certified at every budget. Moreover,
+its mean time at $n=100$ is non-monotone (33.5, 31.6, 39.9\,s), so
+the pooled decrease is not a universal budget trend. Its mean gap also
+rises slightly from 0.02\% to 0.03\% between the two larger budgets,
+while remaining within tolerance on every run.
+
+For CVaR, certification counts are non-increasing with $\alpha$ for
+every method at each training size. Path-exp changes from 15/15 to
+6/15 and 0/15, with mean gaps 0.07\%, 3.07\% and 7.40\% and
+maximum gaps 0.10\%, 8.23\% and 12.40\%. Its mean times and SDs
+are $29.0\pm39.6$\,s, $1176.5\pm808.1$\,s and
+$1804.9\pm3.0$\,s. The gap increases and mean-time increases also
+hold separately at $n=100,200,400$. At the largest budget, none of
+the six methods certifies a CVaR run; Path-exp and Coverage-exp still
+have smaller maximum gaps (12.40\% and 15.90\%) than Root (26.60\%).
+The contraction in Path-exp's time dispersion at $\alpha=0.03$
+therefore accompanies universal time limitation, not faster resolution.
+
+For mean--CVaR, Path-exp retains 15/15, 10/15 and 5/15 as the budget
+increases. Its mean gaps are 0.06\%, 1.84\% and 4.41\%, its maxima
+0.10\%, 7.26\% and 10.86\%, and its times
+$22.8\pm21.6$\,s, $884.5\pm807.1$\,s and $1532.0\pm508.1$\,s.
+The non-increasing certification counts and increasing mean gaps hold
+within each training size. The five certifications at the largest
+budget comprise four at $n=100$, one at $n=200$ and none at $n=400$.
+At $n=400$, mean times at the two larger budgets are both near the
+limit (1810.0 and 1806.3\,s), with a slight decrease despite the
+higher gap. Other metrics need not follow certification monotonically:
+Extensive SAA's mean gap is 22.07\%, 14.41\% and 16.80\%, and
+Combinatorial B\&B's maximum gap is 14.25\%, 8.03\% and 16.29\%.
+These exceptions reinforce the need to report both gap summaries and
+time dispersion alongside $N_{\rm opt}/N$.
 
 \FloatBarrier
 \subsection{Independent \texttt{Sub20} projected-inequality panel}

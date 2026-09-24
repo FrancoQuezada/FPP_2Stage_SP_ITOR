@@ -1,0 +1,44 @@
+\clearpage
+\section{Computational statistics by budget}\label{app:alpha}
+
+Each row below uses all 15 reduced \texttt{new20x20} runs for one
+objective, method and budget: five replications at each of
+$n=100,200,400$. Gap columns are percentages; time columns are seconds.
+$N_{\rm opt}$ counts runs resolved to relative gap $10^{-3}$.
+SD denotes the sample standard deviation, with denominator $15-1$.
+Positive certified gaps and recorded time-limit overruns are retained.
+These tables use the same source and reproduction script as
+Table~\ref{tab:new20-gaps-times}. The generated file
+\texttt{tables/new20\_statistics.csv} additionally records statistics
+for every five-run $(\alpha,n)$ block, enabling the within-size
+checks discussed in Section~\ref{sec:alpha-results}.
+
+\begin{center}
+\begin{minipage}{0.98\linewidth}\centering\small
+\setlength{\tabcolsep}{3pt}
+\captionof{table}{Expected loss: $N_{\rm opt}/15$, mean and maximum final
+MIP gaps (\%), and mean observed time and sample SD (s), by budget.}
+\label{tab:alpha-Expected}
+\input{tables/new20_alpha_Expected}
+\end{minipage}
+\end{center}
+\clearpage
+\begin{center}
+\begin{minipage}{0.98\linewidth}\centering\small
+\setlength{\tabcolsep}{3pt}
+\captionof{table}{CVaR: $N_{\rm opt}/15$, mean and maximum final
+MIP gaps (\%), and mean observed time and sample SD (s), by budget.}
+\label{tab:alpha-CVaR}
+\input{tables/new20_alpha_CVaR}
+\end{minipage}
+\end{center}
+\clearpage
+\begin{center}
+\begin{minipage}{0.98\linewidth}\centering\small
+\setlength{\tabcolsep}{3pt}
+\captionof{table}{Mean--CVaR: $N_{\rm opt}/15$, mean and maximum final
+MIP gaps (\%), and mean observed time and sample SD (s), by budget.}
+\label{tab:alpha-MeanCVaR}
+\input{tables/new20_alpha_MeanCVaR}
+\end{minipage}
+\end{center}

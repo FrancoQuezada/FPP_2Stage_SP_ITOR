@@ -17,9 +17,14 @@ runs under expected loss, CVaR and mean--CVaR. For example, the
 Path-exp method reaches the requested $10^{-3}$ gap in 39, 21 and 30
 of 45 cases for the three objectives, respectively; the LP-dual root
 baseline reaches it in 26, 15 and 15. These counts characterize solver
-certification at a 1,800-second limit. Paired-runtime comparisons on
-jointly certified instances and final gaps of unresolved instances
-provide further, explicitly conditional evidence. A separate 1,440-run
+certification at a 1,800-second limit. Mean and maximum final gaps and observed time means and sample
+standard deviations summarize all runs, including those stopped at the
+time limit. Increasing the budget is associated with fewer
+certifications for the decomposition methods in this panel; extensive
+SAA under expected loss is an exception, improving from 12/15 to 15/15.
+Budget-conditioned results and the reported time dispersion distinguish
+these objective-dependent patterns without interpreting censored times
+as completed solves. A separate 1,440-run
 \texttt{Sub20} campaign permits the polynomial versus separated
 projected-inequality comparison, but its 62 extensive-model validation
 warnings prevent unrestricted solution-quality comparisons.

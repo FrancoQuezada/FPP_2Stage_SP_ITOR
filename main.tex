@@ -53,6 +53,9 @@ reduced 20-by-20 panel has 810 runs under expected loss, CVaR and
 mean--CVaR. At a 1,800-second limit and requested relative gap $10^{-3}$,
 projected PathLLBI reaches the tolerance in 39, 21 and 30 of 45 cases
 per objective, versus 26, 15 and 15 for the LP-dual root baseline.
+Mean and maximum gaps and observed time means and sample standard
+deviations are reported over all runs. Budget-conditioned results reveal
+objective-dependent certification patterns.
 A separate 1,440-run Sub20 campaign compares polynomial and separated
 inequalities. Incomplete Reburn data, displaced placement/evaluation
 fields and missing original scenario graphs prevent a validated
@@ -72,6 +75,9 @@ Firebreak placement \sep Stochastic programming \sep Branch-and-Benders
 \input{sections/computational_methodology}
 \input{sections/results_discussion}
 \input{sections/conclusions}
+
+\appendix
+\input{sections/results_alpha_appendix}
 
 \bibliographystyle{cas-model2-names}
 \bibliography{cas-refs}

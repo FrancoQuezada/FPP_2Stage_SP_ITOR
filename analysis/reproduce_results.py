@@ -11,7 +11,8 @@ import argparse
 import csv
 from collections import Counter, defaultdict
 from pathlib import Path
-from statistics import median
+from statistics import mean, stdev
+from math import isfinite
 
 OBJECTIVES = ("Expected", "CVaR", "MeanCVaR")
 METHODS = ("SAA", "Root", "Standard", "Coverage-exp", "Path-exp", "Combinatorial")
@@ -51,8 +52,9 @@ def key(r):
 def test_run(r):
     gap = float(r["mip_gap"])
     assert r["solver_status"] in ("Optimal", "Feasible"), r
-    assert (r["solver_status"] == "Optimal") == (gap <= .001000001), (r["task_id"], gap)
-    assert float(r["runtime_seconds"]) > 0
+    assert (r["solver_status"] == "Optimal") == (gap <= .001), (r["task_id"], gap)
+    assert isfinite(gap) and gap >= 0
+    assert isfinite(float(r["runtime_seconds"])) and float(r["runtime_seconds"]) > 0
     return r["solver_status"] == "Optimal"
 
 
@@ -67,6 +69,7 @@ def verify_new20(base: Path, implementation: Path):
     assert len(rows) == 1329 and len(headers) == 132
     assert headers[108] == "selected_firebreaks" and headers[122:] == [""] * 10
     assert len(set(headers[:108])) == 108  # the trailing malformed fields are never read
+    rows = [{field: r[field] for field in headers[:108]} for r in rows]
     _, manifest = read_csv(campaign / "manifests/full_task_manifest.csv")
     assert len(manifest) == 2160 and len({r["method"] for r in manifest}) == 18
     tasks = {r["task_id"]: r for r in manifest}
@@ -88,18 +91,24 @@ def verify_new20(base: Path, implementation: Path):
             assert r[field] == m[field], (r["task_id"], field)
         assert m["threads"] == "1" and m["time_limit"] == r["time_limit"] == "1800"
         assert m["mip_gap"] == "0.001" and m["test_count"] == "1000"
+        assert m["cvar_beta"] == "0.9"
+        if r["objective_family"] == "MeanCVaR":
+            assert m["cvar_lambda"] == "0.5"
         test_run(r)
     reduced = [r for r in rows if r["instance_id"] == "new20x20"]
     assert Counter(r["solver_status"] for r in reduced) == {"Optimal": 424, "Feasible": 386}
     groups = defaultdict(list)
     for r in reduced:
         assert r["train_count"] in ("100", "200", "400") and r["alpha"] in ("0.01", "0.02", "0.03")
+        assert r["case_id"] in {f"case{i:02d}" for i in range(5)}
+        assert r["objective_family"] in OBJECTIVES
         groups[key(r)].append(r)
     assert len(groups) == 135
     split_cache = {}
     for group, runs in groups.items():
         assert len(runs) == 6 and {classify(r["method"]) for r in runs} == set(METHODS)
         paths = {(tasks[r["task_id"]]["train_split_path"], tasks[r["task_id"]]["test_split_path"]) for r in runs}
+        assert len({tuple(tasks[r["task_id"]][f] for f in ("instance_id", "alpha", "objective_family", "risk_measure", "cvar_beta", "cvar_lambda", "time_limit", "mip_gap", "threads")) for r in runs}) == 1
         assert len(paths) == 1
         training, testing = next(iter(paths))
         for name in (training, testing):
@@ -160,42 +169,69 @@ def verify_sub20(base: Path):
     return groups
 
 
+def summarize(rr):
+    """All recorded runs; gap in percent and sample standard deviation of time."""
+    assert len(rr) > 1
+    gaps = [100 * float(r["mip_gap"]) for r in rr]
+    times = [float(r["runtime_seconds"]) for r in rr]
+    return (sum(test_run(r) for r in rr), len(rr), mean(gaps), max(gaps), mean(times), stdev(times))
+
+
 def write_tables(groups, subgroups, output: Path):
     output.mkdir(parents=True, exist_ok=True)
     by_objective = defaultdict(lambda: defaultdict(list))
     for k, runs in groups.items():
         for r in runs:
             by_objective[k[3]][classify(r["method"])].append(r)
-    solve = [r"\begin{tabular}{llrrrr}", r"\toprule",
-             r"Objective & Method & $n=100$ & $n=200$ & $n=400$ & Total \\", r"\midrule"]
-    gaps = [r"\begin{tabular}{llrrrr}", r"\toprule",
-            r"Objective & Method & Unsolved & Median gap (\%) & Paired & Time ratio \\", r"\midrule"]
+    def table(header, spec):
+        return [r"\begin{tabular}{" + spec + "}", r"\toprule", header + r" \\", r"\midrule"]
+    def finish(lines, name):
+        (output / name).write_text("\n".join(lines + [r"\bottomrule", r"\end{tabular}"]) + "\n")
+    def cells(rr):
+        opt, total, avg_gap, max_gap, avg_time, sd_time = summarize(rr)
+        return f"{opt}/{total} & {avg_gap:.2f} & {max_gap:.2f} & {avg_time:.1f} & {sd_time:.1f}"
+    solve = table(r"Objective & Method & $n=100$ & $n=200$ & $n=400$ & Total", "llrrrr")
+    gaps = table(r"Objective & Method & $N_{\rm opt}/N$ & Mean gap & Max gap & Mean time & SD time", "llrrrrr")
+    alpha_solved = table(r"Objective & Method & $\alpha=0.01$ & $\alpha=0.02$ & $\alpha=0.03$", "llrrr")
+    records = []
     for oi, objective in enumerate(OBJECTIVES):
         if oi:
-            solve.append(r"\midrule")
-            gaps.append(r"\midrule")
-        root = {key(r)[:3]: r for r in by_objective[objective]["Root"]}
-        for method in METHODS:
+            for lines in (solve, gaps, alpha_solved): lines.append(r"\midrule")
+        alpha_table = table(r"Method & $\alpha$ & $N_{\rm opt}/N$ & Mean gap & Max gap & Mean time & SD time", "lrrrrrr")
+        for mi, method in enumerate(METHODS):
             rr = by_objective[objective][method]
             assert len(rr) == 45
-            counts = [sum(test_run(r) for r in rr if r["train_count"] == n) for n in ("100", "200", "400")]
-            assert all(sum(r["train_count"] == n for r in rr) == 15 for n in ("100", "200", "400"))
-            solve.append(f'{LATEX[objective]} & {LABEL[method]} & {counts[0]} & {counts[1]} & {counts[2]} & {sum(counts)} \\\\')
-            unresolved = [100 * float(r["mip_gap"]) for r in rr if not test_run(r)]
-            pairs = [(r, root[key(r)[:3]]) for r in rr if test_run(r) and test_run(root[key(r)[:3]])]
-            ratio = median(float(r["runtime_seconds"]) / float(b["runtime_seconds"]) for r, b in pairs)
-            gaps.append(f'{LATEX[objective]} & {LABEL[method]} & {len(unresolved)} & {median(unresolved):.2f} & {len(pairs)} & {ratio:.2f} \\\\')
-    for lines, filename in [(solve, "new20_solved.tex"), (gaps, "new20_gaps_times.tex")]:
-        lines += [r"\bottomrule", r"\end{tabular}"]
-        (output / filename).write_text("\n".join(lines) + "\n", encoding="utf-8")
-    sub = [r"\begin{tabular}{lrrr}", r"\toprule",
-           r"Method & Expected & CVaR & Mean--CVaR \\", r"\midrule"]
+            by_n = [[r for r in rr if r["train_count"] == n] for n in ("100", "200", "400")]
+            by_alpha = [[r for r in rr if r["alpha"] == a] for a in ("0.01", "0.02", "0.03")]
+            assert all(len(x) == 15 for x in by_n + by_alpha)
+            assert sum(summarize(x)[0] for x in by_n) == summarize(rr)[0] == sum(summarize(x)[0] for x in by_alpha)
+            prefix = f"{LATEX[objective]} & {LABEL[method]} & "
+            solve.append(prefix + " & ".join(f"{summarize(x)[0]}/{len(x)}" for x in by_n + [rr]) + r" \\")
+            gaps.append(prefix + cells(rr) + r" \\")
+            alpha_solved.append(prefix + " & ".join(f"{summarize(x)[0]}/15" for x in by_alpha) + r" \\")
+            if mi: alpha_table.append(r"\addlinespace")
+            for alpha, subset in zip(("0.01", "0.02", "0.03"), by_alpha):
+                alpha_table.append(f"{LABEL[method]} & {alpha} & " + cells(subset) + r" \\")
+            # Machine-readable statistics also expose each five-replication alpha/n block.
+            for alpha in ("all", "0.01", "0.02", "0.03"):
+                for n in ("all", "100", "200", "400"):
+                    subset = [r for r in rr if (alpha == "all" or r["alpha"] == alpha) and (n == "all" or r["train_count"] == n)]
+                    assert len(subset) == (45 if alpha == n == "all" else 15 if "all" in (alpha, n) else 5)
+                    records.append((objective, method, alpha, n, *summarize(subset)))
+        finish(alpha_table, f"new20_alpha_{objective}.tex")
+    finish(solve, "new20_solved.tex")
+    finish(gaps, "new20_gaps_times.tex")
+    finish(alpha_solved, "new20_alpha_solved.tex")
+    with (output / "new20_statistics.csv").open("w", newline="") as stream:
+        writer = csv.writer(stream)
+        writer.writerow(("objective", "method", "alpha", "train_count", "optimal", "total", "mean_gap_pct", "max_gap_pct", "mean_time_s", "sample_sd_time_s"))
+        writer.writerows(records)
+    sub = table(r"Method & Expected & CVaR & Mean--CVaR", "lrrr")
     for method in SUB_METHODS:
         counts = [sum(test_run(r) for group, runs in subgroups.items() if group[3] == obj
                       for r in runs if classify(r["method"]) == method) for obj in OBJECTIVES]
-        sub.append(f'{LABEL[method]} & {counts[0]} & {counts[1]} & {counts[2]} \\\\')
-    sub += [r"\bottomrule", r"\end{tabular}"]
-    (output / "sub20_solved.tex").write_text("\n".join(sub) + "\n", encoding="utf-8")
+        sub.append(f'{LABEL[method]} & {counts[0]}/60 & {counts[1]}/60 & {counts[2]}/60' + r" \\")
+    finish(sub, "sub20_solved.tex")
     return by_objective
 
 
@@ -247,7 +283,7 @@ def main():
     by_objective = write_tables(groups, sub, args.manuscript / "tables")
     write_figure(by_objective, args.manuscript / "figs/new20_certified.tex")
     print("Checked: 810 complete reduced runs, 519 partial Reburn, 1440 Sub20; 60/60 Reburn training splits differ.")
-    print("Wrote three tables and one certified-runtime plot; new20 fields after selected_firebreaks excluded.")
+    print("Wrote seven tables, full statistics CSV and one certified-runtime plot; new20 fields after selected_firebreaks excluded.")
 
 
 if __name__ == "__main__":

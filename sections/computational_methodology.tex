@@ -100,13 +100,28 @@ placements, training or test evaluation fields, hardware or effective
 solver version. The separate \texttt{Sub20} consolidated file has a
 consistent 230-column header and explicit validation statuses.
 
-A status of \texttt{Optimal} with final relative gap at most $10^{-3}$
-is called \emph{resolved to the requested tolerance}, rather than a
-proof of zero gap. All \texttt{Feasible} observations are treated as
-time-limited for solver-time analyses; their recorded final gaps are
-reported separately. Any runtime ratio compares only the same instance,
-budget, training IDs, objective, solver limit and two methods that both
-reached the tolerance. Runs lacking certification do not enter a ratio.
+A run contributes to $N_{\rm opt}$ only if its status is
+\texttt{Optimal} and its final relative gap is at most $10^{-3}$.
+We call this resolved to the requested tolerance; it is not necessarily
+a proof of zero gap. We report $N_{\rm opt}/N$, where $N=45$ per
+objective and method, or $N=15$ when conditioning on either training
+size or budget. For any such set of runs $I$, with recorded relative
+gaps $g_i$ and solver times $t_i$, the reported summaries are
+\[
+ \overline g_I=\frac{100}{|I|}\sum_{i\in I}g_i,\qquad
+ g_I^{\max}=100\max_{i\in I}g_i,\qquad
+ \overline t_I=\frac{1}{|I|}\sum_{i\in I}t_i,\qquad
+ s_{t,I}=\sqrt{\frac{\sum_{i\in I}(t_i-\overline t_I)^2}{|I|-1}}.
+\]
+Gap summaries are percentages; time means and sample standard
+deviations are seconds. All recorded runs in the set enter every
+summary. Positive gaps of certified runs are retained. Recorded times
+of time-limited runs are neither discarded nor replaced by 1,800\,s,
+including any recorded overrun. These observed computational times
+describe resource consumption under the stopping rule. Because time
+to certification is censored for runs without certification, their
+mean is not an estimate of unrestricted time to optimality and must
+be interpreted jointly with $N_{\rm opt}/N$ and the gap summaries.
 The fraction resolved by each time in Fig.~\ref{fig:new20-certified}
 uses a common denominator of 45 per objective and method; time-limited
 runs remain unresolved at the 1,800-second horizon.
