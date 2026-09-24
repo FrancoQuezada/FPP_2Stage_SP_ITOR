@@ -6,10 +6,13 @@ We distinguish the \texttt{fpp\_new20x20\_scaling} campaign from the
 principal numerical panel uses only the reduced \texttt{new20x20} rows of
 the first campaign. Its Reburn rows are incomplete and cannot be used as
 a paired evaluation. The second campaign is reported separately because
-it uses another landscape, different samples and additional methods.
-For reproducibility, the counts and tables in this article can be
-reconstructed by \texttt{analysis/reproduce\_results.py} from the
-committed batch files in the implementation repository.
+it uses another landscape, different samples and additional methods. A
+third, paired sensitivity experiment compares the two combinatorial
+scenario orders on 100 and 200 training scenarios; it is not pooled with
+either panel. For reproducibility, \texttt{analysis/reproduce\_results.py}
+and \texttt{analysis/reproduce\_combinatorial\_order.py} reconstruct the
+reported tables from committed batch files in the implementation
+repository.
 
 \subsection{Recorded design and graph classification}
 
@@ -64,7 +67,9 @@ in the implementation); the manifest does not record a per-run override
 of that path cap. The combinatorial method has its own cut construction
 and candidate checks; its 0.10 initial sampling fraction does not allow
 an unchecked candidate to be accepted. The panel has one combinatorial
-ordering and has no projected \texttt{poly} variants.
+configuration and has no projected \texttt{poly} variants. The separate
+order-sensitivity experiment described below does not add a seventh
+method or alter any denominator in the 810-run panel.
 
 \begin{center}
 \begin{minipage}{0.97\linewidth}\centering\small
@@ -125,6 +130,46 @@ be interpreted jointly with $N_{\rm opt}/N$ and the gap summaries.
 The fraction resolved by each time in Fig.~\ref{fig:new20-certified}
 uses a common denominator of 45 per objective and method; time-limited
 runs remain unresolved at the 1,800-second horizon.
+
+\subsection{Paired combinatorial-order sensitivity}
+\label{sec:order-design}
+
+The order experiment uses only the combinatorial \texttt{new20x20} rows
+with $n\in\{100,200\}$ from two campaigns under \path{Results_server}.
+The legacy \path{fpp_new_instances_scaling} directory supplies 90 runs
+of the base combinatorial labels. Its CSV, manifest and JSON files do
+not record the order field. We therefore label these runs $\eta$-asc as
+an inference: the recoverable implementation declares ascending order
+as its default, the manifest generator assigns $\eta$-asc to base labels,
+and the implementation documentation says this default preserves the
+previous behavior. This evidence does not identify the exact executable
+commit used by that campaign. The directory
+\path{fpp_new_instances_scaling_new20x20_100_200} supplies 90
+$\eta$-desc runs; descending order is explicit in its method labels,
+manifest, consolidated CSV and worker JSON files.
+
+Pairing uses the scientific key consisting of instance, replication,
+$\alpha$, training size and objective, not the reusable task identifier.
+All 90 pairs have byte-identical training and test split files and match
+on the 1,000 test identifiers, graph representation, risk settings,
+1,800-second limit, $10^{-3}$ requested gap, one thread, heuristic
+lifting, 0.10 sampling fraction, initial cuts and fractional separation.
+The design contains three objectives, two training sizes, three budgets
+and five replications: 30 pairs per objective, 15 per objective and
+training size, and 10 per objective and budget. All 180 worker JSON
+records have validation status \texttt{pass}, and their status, gap and
+time fields agree with the consolidated files.
+
+The ascending records are timestamped June 25--26, 2026, whereas the
+descending records are timestamped July 3--4, 2026. Neither campaign
+records the hardware or effective solver version. Certification and
+gap comparisons are therefore paired on their scientific inputs, but
+runtime differences remain observed cross-campaign differences and
+cannot be attributed exclusively to scenario order. The summaries use
+the definitions above with $N=30$, 15 or 10 as appropriate. Results at
+400 or 600 scenarios found elsewhere under \path{Results_server} are
+excluded because their provenance is not reconciled with these two
+paired campaigns; the reproduction script admits only $n=100,200$.
 
 \subsection{Paired graph and held-out evaluation}\label{sec:evaluation}
 

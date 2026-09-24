@@ -53,13 +53,17 @@ methods on matched scenario samples. The complete 810-run reduced
 \texttt{new20x20} panel covers three objectives, three training sizes
 and six methods per objective. It supplies certification counts,
 mean and maximum final gaps, and observed solver-time means and
-sample standard deviations, with an explicit budget-level analysis. A distinct 1,440-run
-\texttt{Sub20} panel tests polynomial and separated projected
-inequalities. These data support statements about computational
-certification on the reported panels; corrupted placement/evaluation
-fields, incomplete Reburn runs and missing source graphs preclude
-conclusions about out-of-sample placement quality or the reduced/Reburn
-loss difference.
+sample standard deviations, with an explicit budget-level analysis. A
+separate 180-run paired sensitivity experiment tests ascending and
+descending ordering of current scenario recourse estimates in
+Combinatorial B\&B. Its effect is objective-dependent: descending order
+improves mean--CVaR certification in this experiment, but not CVaR. A
+distinct 1,440-run \texttt{Sub20} panel tests polynomial and separated
+projected inequalities. These data support statements about
+computational certification on the reported panels; corrupted
+placement/evaluation fields, incomplete Reburn runs and missing source
+graphs preclude conclusions about out-of-sample placement quality or
+the reduced/Reburn loss difference.
 
 Section~\ref{sec:setting} specifies the graphs and conditional reduction
 result; Section~\ref{sec:model} develops the stochastic model and

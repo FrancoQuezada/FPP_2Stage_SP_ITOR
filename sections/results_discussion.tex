@@ -1,13 +1,14 @@
 \section{Results and discussion}\label{sec:results}
 
-The two campaigns answer different computational questions. The first
-provides a complete \emph{reduced-graph} method panel at three training
-sizes; the second supplies an independent, complete \texttt{Sub20} panel
-including both \texttt{poly} and \texttt{exp} variants. Neither provides
+The two principal campaigns answer different computational questions.
+The first provides a complete \emph{reduced-graph} method panel at three
+training sizes; the second supplies an independent, complete
+\texttt{Sub20} panel including both \texttt{poly} and \texttt{exp}
+variants. A further paired experiment isolates the recorded
+Combinatorial B\&B scenario orders at two training sizes. None provides
 a verified placement-by-placement reduced/Reburn comparison. We report
-certification and solver timing from the well-formed prefix of the
-\texttt{new20x20} consolidated CSV and keep decision-quality claims
-separate from these computational results.
+certification and solver timing from auditable fields and keep
+decision-quality claims separate from these computational results.
 
 \subsection{The reduced \texttt{new20x20} panel}
 
@@ -177,6 +178,90 @@ Extensive SAA's mean gap is 22.07\%, 14.41\% and 16.80\%, and
 Combinatorial B\&B's maximum gap is 14.25\%, 8.03\% and 16.29\%.
 These exceptions reinforce the need to report both gap summaries and
 time dispersion alongside $N_{\rm opt}/N$.
+
+\FloatBarrier
+\subsection{Sensitivity to combinatorial scenario order}
+\label{sec:order-results}
+
+This sensitivity experiment is separate from the 810-run panel. It
+compares 90 matched configurations under each order, restricted to
+$n=100,200$; Tables~\ref{tab:comb-order-n} and
+\ref{tab:comb-order-alpha} in Appendix~\ref{app:alpha} give the
+training-size and budget disaggregations. Table~\ref{tab:comb-order-main}
+reports all 30 runs per objective and order. The order changes which
+current master estimates are examined first, not the model being solved;
+as discussed in Section~\ref{sec:combinatorial-order}, a large
+$\eta_s$ estimate need not identify a realized CVaR-tail loss.
+
+\begin{center}
+\begin{minipage}{0.98\linewidth}\centering\small
+\setlength{\tabcolsep}{3pt}
+\captionof{table}{Combinatorial B\&B order sensitivity over 30 runs per
+objective and order: $N_{\rm opt}/N$, mean and maximum final relative
+MIP gap (\%), and mean observed time and sample SD (s). Every statistic
+includes all runs at $n=100,200$. The ascending label is inferred from
+the documented legacy default; the descending label is recorded.}
+\label{tab:comb-order-main}
+\input{tables/combinatorial_order_main}
+\end{minipage}
+\end{center}
+
+For expected loss, $\eta$-asc and $\eta$-desc certify 28/30 and 29/30
+runs. Their mean gaps are 0.25\% and 0.22\%, maximum gaps 4.00\% and
+6.01\%, and observed times $142.8\pm454.0$ and
+$97.8\pm324.1$\,s. The aggregate time does not establish a general
+descending-order advantage. Both orders certify 14/15 runs at $n=100$;
+at $n=200$, the counts are 14/15 and 15/15. At
+$\alpha=0.01$ and 0.02 both certify all ten runs, and ascending has the
+lower observed mean time (10.4 versus 14.0\,s and 20.7 versus 33.4\,s).
+At $\alpha=0.03$, the counts fall to 8/10 and 9/10. Moreover, among the
+27 pairs certified by both orders, ascending is faster in all 27, with
+conditional means of 22.4 and 35.6\,s. This conditioned comparison has
+a common solved-pair denominator but excludes the differently censored
+runs.
+
+For CVaR, descending order does not improve certification: the counts
+are 16/30 for $\eta$-asc and 15/30 for $\eta$-desc. Mean gaps are
+4.13\% and 4.39\%, both orders have a 19.30\% maximum gap, and their
+observed times are $1075.9\pm815.0$ and $1063.5\pm830.7$\,s. The
+counts are tied at 8/15 for $n=100$ and change from 8/15 to 7/15 at
+$n=200$. By budget, both orders certify 10/10 at $\alpha=0.01$, the
+ascending order certifies 6/10 versus 5/10 at 0.02, and neither
+certifies a run at 0.03. Among the 15 jointly certified pairs,
+descending is faster in 12, with conditional means of 362.0 and
+318.6\,s for ascending and descending. That secondary result does not
+offset the absence of a certification gain.
+
+The clearest descending-order difference occurs for mean--CVaR. Its
+certification count rises from 21/30 to 25/30, while the mean gap falls
+from 3.30\% to 0.40\%, the maximum gap from 16.29\% to 3.68\%, and
+observed time from $783.0\pm766.6$ to $514.0\pm651.5$\,s. The count
+increase appears at both training sizes: 9/15 to 11/15 for $n=100$ and
+12/15 to 14/15 for $n=200$. It is not uniform over budgets: the counts
+are 9/10 versus 10/10 at $\alpha=0.01$, tied at 9/10 at 0.02, and
+3/10 versus 6/10 at 0.03. Descending is faster for 20 of the 21 pairs
+certified by both, with conditional means of 343.6 versus 214.0\,s.
+
+Table~\ref{tab:comb-order-paired} makes the paired certification changes
+explicit. No CVaR pair is certified only by descending, whereas four
+mean--CVaR pairs are; Expected has one ascending-only and two
+descending-only cases. The evidence therefore supports retaining both
+orders in the analysis: descending is favorable for mean--CVaR in this
+experiment, but that pattern does not extend to CVaR and is weaker for
+expected loss. Because the campaigns were executed on different dates
+and do not record hardware or effective solver version, even the paired
+runtime differences remain descriptive rather than an identified causal
+effect of order.
+
+\begin{center}
+\begin{minipage}{0.82\linewidth}\centering\small
+\captionof{table}{Paired certification outcomes for the 30 matched
+configurations per objective. ``Asc only'' and ``Desc only'' identify
+discordant pairs; every row sums to 30.}
+\label{tab:comb-order-paired}
+\input{tables/combinatorial_order_paired}
+\end{minipage}
+\end{center}
 
 \FloatBarrier
 \subsection{Independent \texttt{Sub20} projected-inequality panel}

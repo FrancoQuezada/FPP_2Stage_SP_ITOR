@@ -24,10 +24,19 @@ certifications for the decomposition methods in this panel; extensive
 SAA under expected loss is an exception, improving from 12/15 to 15/15.
 Budget-conditioned results and the reported time dispersion distinguish
 these objective-dependent patterns without interpreting censored times
-as completed solves. A separate 1,440-run
-\texttt{Sub20} campaign permits the polynomial versus separated
-projected-inequality comparison, but its 62 extensive-model validation
-warnings prevent unrestricted solution-quality comparisons.
+as completed solves. In the separate 180-run paired sensitivity,
+descending instead of ascending current recourse estimates changes
+Combinatorial B\&B certification from 28/30 to 29/30 for expected loss,
+16/30 to 15/30 for CVaR, and 21/30 to 25/30 for mean--CVaR. The
+mean--CVaR improvement appears at both training sizes, whereas CVaR
+shows no descending-order gain. Hence scenario order is an
+objective-dependent search choice rather than a generally dominant
+rule. Runtime differences remain descriptive because hardware and the
+effective solver version were not recorded and the two campaigns ran
+on different dates. A separate 1,440-run \texttt{Sub20} campaign
+permits the polynomial versus separated projected-inequality comparison,
+but its 62 extensive-model validation warnings prevent unrestricted
+solution-quality comparisons.
 
 The value of the reduced representation for firebreak \emph{decisions}
 remains open. The first campaign's Reburn records are incomplete; all
