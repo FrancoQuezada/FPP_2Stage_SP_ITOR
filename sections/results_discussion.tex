@@ -11,10 +11,11 @@ and final gap because unresolved runs reached the stopping limit.
 \begin{center}
 \begin{minipage}{0.98\linewidth}\centering\small
 \setlength{\tabcolsep}{3pt}
-\captionof{table}{Reduced \texttt{new20x20}: certifications, mean and
-maximum final relative MIP gap (\%), and mean observed solver time and
-sample standard deviation (s). Each row contains all 45 runs, including
-uncertified runs and recorded time overruns. Generated from the 810
+\captionof{table}{Reduced \texttt{new20x20}: percentage certified to
+relative MIP gap $10^{-3}$ ($100N_{\rm opt}/N$, $N=45$ per row), mean
+and maximum final relative MIP gaps (\%), and mean observed solver
+time (s). All 45 runs, including uncertified runs and recorded time
+overruns, enter the gap and time statistics. Generated from the 810
 run-level records by \texttt{analysis/reproduce\_results.py}.}
 \label{tab:new20-gaps-times}
 \input{tables/new20_gaps_times}
@@ -47,45 +48,41 @@ reconstructed by \texttt{analysis/reproduce\_results.py}.}
 \label{fig:new20-certified}
 \end{figure}
 
-Aggregation masks systematic difficulty differences. Table
-\ref{tab:new20-solved} gives certification by training size; Table
-\ref{tab:new20-alpha-solved} gives it by budget. At $n=400$,
-Combinatorial B\&B certifies all 15 expected-loss runs while extensive
-SAA certifies 12 and Path-exp 10. Under CVaR, Path-exp's counts are
-9, 7 and 5 out of 15 as $n$ grows; under mean--CVaR they are 14,
-11 and 5. At $\alpha=0.03$, \emph{no} CVaR configuration certifies
-any of its 15 runs. Under mean--CVaR, Path-exp certifies 5/15 at this
-budget, while Coverage-exp, Combinatorial B\&B and extensive SAA each
-certify 1/15. For expected loss at the largest budget, Combinatorial
-B\&B certifies 13/15, extensive SAA 15/15, and Path-exp 9/15.
-The pooled expected-loss preference thus has a budget-specific
-exception in certification, even though extensive SAA takes more
-observed time overall.
+Increasing $n$ makes the risk-objective instances harder for the best
+recorded configuration. For Path-exp under CVaR, the certified counts
+at $n=100,200,400$ are 9, 7 and 5 of 15; its mean final gap rises
+from 2.18\% to 2.93\% and 5.43\%, and mean observed time from
+753.8 to 1,032.9 and 1,223.8\,s. Under mean--CVaR the corresponding
+counts are 14, 11 and 5, the mean gaps 0.28\%, 1.08\% and 4.95\%,
+and observed times 450.0, 769.6 and 1,219.8\,s. Expected loss
+shows a method-specific exception: Combinatorial B\&B certifies
+14, 14 and 15 of 15 as $n$ grows, with mean final gaps 0.22\%,
+0.27\% and 0.03\%, although its observed mean time rises from
+169.4 to 177.5 and 290.5\,s. Extensive SAA instead certifies
+15, 15 and 12 of 15, and its mean time increases from 35.0 to
+155.5 and 1,038.8\,s. These pooled size comparisons do not isolate
+the effect of $n$ from interactions with the budget.
 
-\begin{center}
-\begin{minipage}{0.98\linewidth}\centering\small
-\captionof{table}{Reduced-graph certifications by training size.
-Every size cell is out of 15; totals are out of 45.}
-\label{tab:new20-solved}
-\input{tables/new20_solved}
-\end{minipage}
-\end{center}
-
-\begin{center}
-\begin{minipage}{0.98\linewidth}\centering\small
-\captionof{table}{Reduced-graph certifications by budget fraction.
-Every cell is out of 15, pooled over three training sizes.}
-\label{tab:new20-alpha-solved}
-\input{tables/new20_alpha_solved}
-\end{minipage}
-\end{center}
+Increasing $\alpha$ is associated with fewer certifications and larger
+gaps for Path-exp on both risk objectives. For CVaR, its counts across
+$\alpha=0.01,0.02,0.03$ are 15, 6 and 0 of 15, mean gaps 0.07\%,
+3.07\% and 7.40\%, and mean observed times 29.0, 1,176.5 and
+1,804.9\,s. For mean--CVaR the corresponding values are 15, 10
+and 5, 0.06\%, 1.84\% and 4.41\%, and 22.8, 884.5 and
+1,532.0\,s. Expected-loss Combinatorial B\&B certifies 15, 15
+and 13 of 15; its mean gap changes from 0.01\% and 0.01\% to
+0.51\%, while observed time rises from 33.5 to 72.8 and
+531.0\,s. Extensive SAA is an exception to the certification
+pattern for expected loss: it rises from 12/15 to 15/15 and 15/15,
+while mean observed time falls from 578.0 to 401.8 and 249.5\,s.
+These associations are descriptive, and times for unresolved runs
+remain censored at the stopping rule.
 
 These comparisons motivate Combinatorial B\&B as the preferred
 expected-loss configuration and Path-exp as the preferred CVaR and
 mean--CVaR configurations for a subsequent decision study. This
 selection is based on certification and final gap, rather than an
-unobserved out-of-sample outcome. Detailed budget-conditioned gaps
-and times appear in Appendix~\ref{app:alpha}.
+unobserved out-of-sample outcome.
 
 \FloatBarrier
 \subsection{Out-of-sample stability of SAA solutions}\label{sec:oos-stability}
@@ -112,41 +109,30 @@ not nested: for example, \texttt{case00} at $\alpha=0.01$ shares only
 four IDs between its 100- and 200-scenario training sets. Cross-size
 \texttt{case\_id} therefore does not establish a paired design.
 
-Optimization error first has to be separated from sampling error.
-Table~\ref{tab:selection-coverage} audits the deterministic rule of
-using the preferred configuration when certified, otherwise choosing
-a certified configuration on the identical sampled problem in the
-order of Table~\ref{tab:methods}. Expected loss would yield 43
-preferred and two certified substitutes, covering all 45 problems.
-For CVaR, only 21/45 problems have a certified solution by any of
-the six methods; for mean--CVaR, 30/45 do. In particular, the complete
-five-replication design is unavailable at $\alpha=0.03$ for CVaR and
-at $n=400,\alpha\geq0.02$ for mean--CVaR. Restricting the analysis to
-certified rows would select easier instances unevenly across $n$ and
-$\alpha$; calling the remaining variability sampling stability would
-be misleading.
+Combinatorial B\&B would be the preselected solution method for
+expected loss, and Path-exp for CVaR and mean--CVaR, based solely on
+Section~\ref{sec:results}. Using Path-exp across all objectives would
+reduce expected-loss certification from 43/45 to 39/45, without
+resolving its 24 uncertified CVaR or 15 uncertified mean--CVaR
+problems. No placements are substituted across methods in this
+decision analysis. Before attributing variation in held-out values
+to sampling, unresolved sampled problems would need comparable
+optimization accuracy. The task-level gaps and availability of
+certified alternatives are recorded in
+\texttt{tables/new20\_selection\_audit.csv}; this audit does not
+measure held-out performance.
 
-\begin{center}
-\begin{minipage}{0.76\linewidth}\centering\small
-\captionof{table}{Availability of any certified method for the same
-reduced SAA problem after the preferred-configuration rule; each
-$(n,\alpha,\text{objective})$ cell contains five independent
-replications. This is an optimization-quality audit, not an OOS
-performance table. The exact task IDs and selection statuses are in
-\texttt{tables/new20\_selection\_audit.csv}.}
-\label{tab:selection-coverage}
-\input{tables/new20_selection_coverage}
-\end{minipage}
-\end{center}
-
-Moreover, the target consolidated file displaces or truncates its
-placement and evaluation suffix; the original worker JSONs and
-solutions are not committed. The pre-suffix CVaR field is an
-aggregate, not the 1,000 scenario losses needed to recompute and
-verify all three objectives for the selected placements. We therefore
-cannot produce an auditable objective-value or Jaccard stability curve
-for the specified panel. No unverified OOS means, dispersions or
-claims that $n=400$ is sufficient enter the paper.
+The target consolidated file displaces or truncates the placement
+and evaluation fields, and its original worker solutions and source
+scenario graphs are unavailable. Neither the selected original cell
+sets nor their 1,000 scenario-level test losses can be independently
+verified. An aggregate CVaR field cannot supply all three test
+objectives. Therefore the mean and sample standard deviation of the
+OOS objective for each of the 27 objective--budget--size combinations,
+and the ten pairwise Jaccard similarities of each five-solution group,
+cannot be estimated from these records. We do not report a partial
+five-replication table selected by certification status or infer
+stability at $n=400$.
 
 \FloatBarrier
 \subsection{Fidelity of the reduced propagation graph}\label{sec:graph-fidelity}

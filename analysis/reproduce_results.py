@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reproduce the manuscript's certified-solve tables from the committed batches.
+"""Reproduce the manuscript's solver table and certification profile.
 
 Only columns preceding selected_firebreaks are read from the damaged new20 CSV.
 Run from anywhere: python analysis/reproduce_results.py --implementation ../implementation
@@ -155,18 +155,12 @@ def write_tables(groups, output: Path):
         return [r"\begin{tabular}{" + spec + "}", r"\toprule", header + r" \\", r"\midrule"]
     def finish(lines, name):
         (output / name).write_text("\n".join(lines + [r"\bottomrule", r"\end{tabular}"]) + "\n")
-    def cells(rr):
-        opt, total, avg_gap, max_gap, avg_time, sd_time = summarize(rr)
-        return f"{opt}/{total} & {avg_gap:.2f} & {max_gap:.2f} & {avg_time:.1f} & {sd_time:.1f}"
-    solve = table(r"Objective & Method & $n=100$ & $n=200$ & $n=400$ & Total", "llrrrr")
-    gaps = table(r"Objective & Method & $N_{\rm opt}/N$ & Mean gap & Max gap & Mean time & SD time", "llrrrrr")
-    alpha_solved = table(r"Objective & Method & $\alpha=0.01$ & $\alpha=0.02$ & $\alpha=0.03$", "llrrr")
+    gaps = table(r"Objective & Method & Certified (\%) & Mean gap (\%) & Max gap (\%) & Mean time (s)", "llrrrr")
     records = []
     for oi, objective in enumerate(OBJECTIVES):
         if oi:
-            for lines in (solve, gaps, alpha_solved): lines.append(r"\midrule")
-        alpha_table = table(r"Method & $\alpha$ & $N_{\rm opt}/N$ & Mean gap & Max gap & Mean time & SD time", "lrrrrrr")
-        for mi, method in enumerate(METHODS):
+            gaps.append(r"\midrule")
+        for method in METHODS:
             rr = by_objective[objective][method]
             assert len(rr) == 45
             by_n = [[r for r in rr if r["train_count"] == n] for n in ("100", "200", "400")]
@@ -174,22 +168,16 @@ def write_tables(groups, output: Path):
             assert all(len(x) == 15 for x in by_n + by_alpha)
             assert sum(summarize(x)[0] for x in by_n) == summarize(rr)[0] == sum(summarize(x)[0] for x in by_alpha)
             prefix = f"{LATEX[objective]} & {LABEL[method]} & "
-            solve.append(prefix + " & ".join(f"{summarize(x)[0]}/{len(x)}" for x in by_n + [rr]) + r" \\")
-            gaps.append(prefix + cells(rr) + r" \\")
-            alpha_solved.append(prefix + " & ".join(f"{summarize(x)[0]}/15" for x in by_alpha) + r" \\")
-            if mi: alpha_table.append(r"\addlinespace")
-            for alpha, subset in zip(("0.01", "0.02", "0.03"), by_alpha):
-                alpha_table.append(f"{LABEL[method]} & {alpha} & " + cells(subset) + r" \\")
+            opt, total, avg_gap, max_gap, avg_time, _ = summarize(rr)
+            assert total == 45
+            gaps.append(prefix + f"{100 * opt / total:.1f} & {avg_gap:.2f} & {max_gap:.2f} & {avg_time:.1f}" + r" \\")
             # Machine-readable statistics also expose each five-replication alpha/n block.
             for alpha in ("all", "0.01", "0.02", "0.03"):
                 for n in ("all", "100", "200", "400"):
                     subset = [r for r in rr if (alpha == "all" or r["alpha"] == alpha) and (n == "all" or r["train_count"] == n)]
                     assert len(subset) == (45 if alpha == n == "all" else 15 if "all" in (alpha, n) else 5)
                     records.append((objective, method, alpha, n, *summarize(subset)))
-        finish(alpha_table, f"new20_alpha_{objective}.tex")
-    finish(solve, "new20_solved.tex")
     finish(gaps, "new20_gaps_times.tex")
-    finish(alpha_solved, "new20_alpha_solved.tex")
     with (output / "new20_statistics.csv").open("w", newline="") as stream:
         writer = csv.writer(stream)
         writer.writerow(("objective", "method", "alpha", "train_count", "optimal", "total", "mean_gap_pct", "max_gap_pct", "mean_time_s", "sample_sd_time_s"))
@@ -198,68 +186,48 @@ def write_tables(groups, output: Path):
 
 
 def write_selection_audit(groups, output: Path):
-    """Audit whether a certified placement could be selected, without using damaged suffix fields."""
+    """Audit preferred-solver certification; do not treat alternatives as selected solutions."""
     preferred = {"Expected": "Combinatorial", "CVaR": "Path-exp", "MeanCVaR": "Path-exp"}
     records = []
     for (alpha, n, case, obj), runs in sorted(groups.items()):
         first = next(r for r in runs if classify(r["method"]) == preferred[obj])
-        certified = [r for r in runs if test_run(r)]
-        if test_run(first):
-            chosen, rule = first, "preferred"
-        elif certified:
-            # An exact same-sample, same-objective substitute: deterministic method order.
-            chosen, rule = min(certified, key=lambda r: METHODS.index(classify(r["method"]))), "certified substitute"
-        else:
-            chosen, rule = None, "no certified method"
-        records.append((obj, alpha, n, case, rule, preferred[obj],
-                        "" if chosen is None else classify(chosen["method"]),
-                        "" if chosen is None else chosen["task_id"],
-                        min(float(r["mip_gap"]) for r in runs)))
+        other_certified = sorted(classify(r["method"]) for r in runs if r is not first and test_run(r))
+        records.append((obj, alpha, n, case, preferred[obj], first["task_id"],
+                        test_run(first), float(first["mip_gap"]),
+                        ";".join(other_certified), min(float(r["mip_gap"]) for r in runs)))
     with (output / "new20_selection_audit.csv").open("w", newline="") as stream:
         writer = csv.writer(stream, lineterminator="\n")
-        writer.writerow(("objective", "alpha", "train_count", "case_id", "selection_status",
-                         "preferred_method", "selected_method", "selected_task_id", "best_available_final_gap"))
+        writer.writerow(("objective", "alpha", "train_count", "case_id", "preferred_method",
+                         "preferred_task_id", "preferred_certified", "preferred_final_gap",
+                         "other_certified_methods", "best_available_final_gap"))
         writer.writerows(records)
     assert len(records) == 135
-    assert Counter(row[4] for row in records) == {
-        "preferred": 94, "certified substitute": 2, "no certified method": 39}
-    lines = [r"\begin{tabular}{llrrrr}", r"\toprule",
-             r"Objective & $\alpha$ & $n=100$ & $n=200$ & $n=400$ & Total \\", r"\midrule"]
-    for obj in OBJECTIVES:
-        for alpha in ("0.01", "0.02", "0.03"):
-            subsets = [[r for r in records if r[0] == obj and r[1] == alpha and r[2] == n]
-                       for n in ("100", "200", "400")]
-            assert all(len(x) == 5 for x in subsets)
-            counts = [sum(r[4] != "no certified method" for r in x) for x in subsets]
-            lines.append(f"{LATEX[obj]} & {alpha} & " + " & ".join(f"{x}/5" for x in counts)
-                         + f" & {sum(counts)}/15" + r" \\")
-        if obj != OBJECTIVES[-1]:
-            lines.append(r"\midrule")
-    (output / "new20_selection_coverage.tex").write_text(
-        "\n".join(lines + [r"\bottomrule", r"\end{tabular}"]) + "\n")
+    assert Counter(row[0] for row in records if row[6]) == {
+        "Expected": 43, "CVaR": 21, "MeanCVaR": 30}
+    assert sum(bool(row[8]) for row in records if not row[6]) == 2
 
 
 def write_figure(by_objective, path: Path):
     """Generate an editable vector PGFPlots figure without a binary asset."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    colors = dict(zip(METHODS, ("gray!80!black", "red!75!black", "orange!85!black",
-                                "blue!75!black", "green!65!black", "violet!75!black")))
+    styles = dict(zip(METHODS, ("gray!85!black,solid", "red!75!black,dashed", "orange!85!black,dotted",
+                                "blue!75!black,dashdotted", "green!60!black,solid", "violet!75!black,dashed")))
     lines = [r"\begin{tikzpicture}",
-             r"\begin{groupplot}[group style={group size=3 by 1,horizontal sep=9pt},",
-             r"  width=0.315\linewidth,height=0.275\linewidth,xmin=0,xmax=1800,",
+             r"\begin{groupplot}[group style={group size=1 by 3,vertical sep=18pt},",
+             r"  width=0.86\linewidth,height=0.22\textheight,xmin=0,xmax=1800,",
              r"  ymin=0,ymax=1,xtick={0,600,1200,1800},ytick={0,0.2,0.4,0.6,0.8,1},",
-             r"  xlabel={Solver time (s)},xlabel style={font=\scriptsize},",
-             r"  tick label style={font=\tiny},title style={font=\small},",
+             r"  tick label style={font=\scriptsize},title style={font=\small},",
              r"  grid=major,grid style={black!15},enlarge x limits=false]" ]
     for j, obj in enumerate(OBJECTIVES):
-        settings = ["title={" + LATEX[obj] + "}"]
+        settings = ["title={" + LATEX[obj] + "}", r"ylabel={Fraction certified}",
+                    r"ylabel style={font=\scriptsize}"]
         if j == 0:
-            settings += [r"ylabel={Fraction certified / 45}",
-                         r"ylabel style={font=\scriptsize}",
-                         "legend to name=certlegend", "legend columns=3",
-                         r"legend style={draw=none,font=\scriptsize}"]
+            settings += ["legend to name=certlegend", "legend columns=3",
+                         r"legend style={draw=none,font=\scriptsize}", "xticklabels={}"]
+        elif j == 1:
+            settings.append("xticklabels={}")
         else:
-            settings.append("yticklabels={}")
+            settings += [r"xlabel={Solver time (s)}", r"xlabel style={font=\scriptsize}"]
         lines.append("\\nextgroupplot[" + ",".join(settings) + "]")
         for method in METHODS:
             rr = by_objective[obj][method]
@@ -268,7 +236,7 @@ def write_figure(by_objective, path: Path):
             points = [(0, 0), *[(time, rank / 45) for rank, time in enumerate(solved, 1)],
                       (1800, len(solved) / 45)]
             coords = " ".join(f"({time:.4f},{fraction:.7f})" for time, fraction in points)
-            lines.append(f"\\addplot+[const plot,mark=none,thin,color={colors[method]}] coordinates {{{coords}}};")
+            lines.append(f"\\addplot+[const plot,mark=none,semithick,{styles[method]}] coordinates {{{coords}}};")
             if j == 0:
                 lines.append("\\addlegendentry{" + method + "}")
     lines += [r"\end{groupplot}", r"\end{tikzpicture}", r"\par\smallskip",
@@ -287,7 +255,7 @@ def main():
     write_selection_audit(groups, args.manuscript / "tables")
     write_figure(by_objective, args.manuscript / "figs/new20_certified.tex")
     print("Checked: 810 complete reduced runs, 519 excluded Reburn rows; 60/60 Reburn training splits differ.")
-    print("Wrote reduced-panel tables, selection audit and certification profile; damaged suffix excluded.")
+    print("Wrote reduced-panel performance table, full statistics, preferred-method audit and enlarged certification profile; damaged suffix excluded.")
 
 
 if __name__ == "__main__":

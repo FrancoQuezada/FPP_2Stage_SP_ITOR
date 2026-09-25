@@ -1,136 +1,136 @@
-objective,alpha,train_count,case_id,selection_status,preferred_method,selected_method,selected_task_id,best_available_final_gap
-CVaR,0.01,100,case00,preferred,Path-exp,Path-exp,worker_000_task_010,0.0
-Expected,0.01,100,case00,preferred,Combinatorial,Combinatorial,worker_000_task_005,0.0
-MeanCVaR,0.01,100,case00,preferred,Path-exp,Path-exp,worker_000_task_016,0.0
-CVaR,0.01,100,case01,preferred,Path-exp,Path-exp,worker_001_task_010,0.00029454
-Expected,0.01,100,case01,preferred,Combinatorial,Combinatorial,worker_001_task_005,0.0
-MeanCVaR,0.01,100,case01,preferred,Path-exp,Path-exp,worker_001_task_016,0.0
-CVaR,0.01,100,case02,preferred,Path-exp,Path-exp,worker_002_task_010,0.0
-Expected,0.01,100,case02,preferred,Combinatorial,Combinatorial,worker_002_task_005,0.0
-MeanCVaR,0.01,100,case02,preferred,Path-exp,Path-exp,worker_002_task_016,0.0
-CVaR,0.01,100,case03,preferred,Path-exp,Path-exp,worker_003_task_010,0.0
-Expected,0.01,100,case03,preferred,Combinatorial,Combinatorial,worker_003_task_005,0.0
-MeanCVaR,0.01,100,case03,preferred,Path-exp,Path-exp,worker_003_task_016,0.0
-CVaR,0.01,100,case04,preferred,Path-exp,Path-exp,worker_004_task_010,0.0
-Expected,0.01,100,case04,preferred,Combinatorial,Combinatorial,worker_004_task_005,0.0
-MeanCVaR,0.01,100,case04,preferred,Path-exp,Path-exp,worker_004_task_016,0.0
-CVaR,0.01,200,case00,preferred,Path-exp,Path-exp,worker_015_task_010,0.0
-Expected,0.01,200,case00,preferred,Combinatorial,Combinatorial,worker_015_task_005,0.0
-MeanCVaR,0.01,200,case00,preferred,Path-exp,Path-exp,worker_015_task_016,0.0
-CVaR,0.01,200,case01,preferred,Path-exp,Path-exp,worker_016_task_010,0.0
-Expected,0.01,200,case01,preferred,Combinatorial,Combinatorial,worker_016_task_005,0.0
-MeanCVaR,0.01,200,case01,preferred,Path-exp,Path-exp,worker_016_task_016,0.00071662
-CVaR,0.01,200,case02,preferred,Path-exp,Path-exp,worker_017_task_010,0.0
-Expected,0.01,200,case02,preferred,Combinatorial,Combinatorial,worker_017_task_005,0.0
-MeanCVaR,0.01,200,case02,preferred,Path-exp,Path-exp,worker_017_task_016,0.0
-CVaR,0.01,200,case03,preferred,Path-exp,Path-exp,worker_018_task_010,0.00028034
-Expected,0.01,200,case03,preferred,Combinatorial,Combinatorial,worker_018_task_005,0.0
-MeanCVaR,0.01,200,case03,preferred,Path-exp,Path-exp,worker_018_task_016,0.00012132
-CVaR,0.01,200,case04,preferred,Path-exp,Path-exp,worker_019_task_010,0.00093819
-Expected,0.01,200,case04,preferred,Combinatorial,Combinatorial,worker_019_task_005,0.0
-MeanCVaR,0.01,200,case04,preferred,Path-exp,Path-exp,worker_019_task_016,0.0
-CVaR,0.01,400,case00,preferred,Path-exp,Path-exp,worker_030_task_010,0.00070232
-Expected,0.01,400,case00,preferred,Combinatorial,Combinatorial,worker_030_task_005,0.0
-MeanCVaR,0.01,400,case00,preferred,Path-exp,Path-exp,worker_030_task_016,0.0
-CVaR,0.01,400,case01,preferred,Path-exp,Path-exp,worker_031_task_010,0.00086895
-Expected,0.01,400,case01,preferred,Combinatorial,Combinatorial,worker_031_task_005,0.0
-MeanCVaR,0.01,400,case01,preferred,Path-exp,Path-exp,worker_031_task_016,0.0
-CVaR,0.01,400,case02,preferred,Path-exp,Path-exp,worker_032_task_010,0.00013242
-Expected,0.01,400,case02,preferred,Combinatorial,Combinatorial,worker_032_task_005,0.0
-MeanCVaR,0.01,400,case02,preferred,Path-exp,Path-exp,worker_032_task_016,0.0
-CVaR,0.01,400,case03,preferred,Path-exp,Path-exp,worker_033_task_010,0.0
-Expected,0.01,400,case03,preferred,Combinatorial,Combinatorial,worker_033_task_005,0.0
-MeanCVaR,0.01,400,case03,preferred,Path-exp,Path-exp,worker_033_task_016,0.0
-CVaR,0.01,400,case04,preferred,Path-exp,Path-exp,worker_034_task_010,0.0
-Expected,0.01,400,case04,preferred,Combinatorial,Combinatorial,worker_034_task_005,0.0
-MeanCVaR,0.01,400,case04,preferred,Path-exp,Path-exp,worker_034_task_016,0.00040634
-CVaR,0.02,100,case00,preferred,Path-exp,Path-exp,worker_005_task_010,0.00097512
-Expected,0.02,100,case00,preferred,Combinatorial,Combinatorial,worker_005_task_005,0.00012849
-MeanCVaR,0.02,100,case00,preferred,Path-exp,Path-exp,worker_005_task_016,0.00097449
-CVaR,0.02,100,case01,preferred,Path-exp,Path-exp,worker_006_task_010,0.00095145
-Expected,0.02,100,case01,preferred,Combinatorial,Combinatorial,worker_006_task_005,0.0
-MeanCVaR,0.02,100,case01,preferred,Path-exp,Path-exp,worker_006_task_016,0.00067416
-CVaR,0.02,100,case02,preferred,Path-exp,Path-exp,worker_007_task_010,0.00097714
-Expected,0.02,100,case02,preferred,Combinatorial,Combinatorial,worker_007_task_005,0.0
-MeanCVaR,0.02,100,case02,preferred,Path-exp,Path-exp,worker_007_task_016,0.00067408
-CVaR,0.02,100,case03,preferred,Path-exp,Path-exp,worker_008_task_010,0.00092501
-Expected,0.02,100,case03,preferred,Combinatorial,Combinatorial,worker_008_task_005,0.0
-MeanCVaR,0.02,100,case03,preferred,Path-exp,Path-exp,worker_008_task_016,0.00078547
-CVaR,0.02,100,case04,no certified method,Path-exp,,,0.05513348
-Expected,0.02,100,case04,preferred,Combinatorial,Combinatorial,worker_009_task_005,0.0
-MeanCVaR,0.02,100,case04,preferred,Path-exp,Path-exp,worker_009_task_016,0.0009969
-CVaR,0.02,200,case00,no certified method,Path-exp,,,0.00596683
-Expected,0.02,200,case00,preferred,Combinatorial,Combinatorial,worker_020_task_005,0.0
-MeanCVaR,0.02,200,case00,preferred,Path-exp,Path-exp,worker_020_task_016,0.00064372
-CVaR,0.02,200,case01,preferred,Path-exp,Path-exp,worker_021_task_010,0.00099315
-Expected,0.02,200,case01,preferred,Combinatorial,Combinatorial,worker_021_task_005,0.0
-MeanCVaR,0.02,200,case01,preferred,Path-exp,Path-exp,worker_021_task_016,0.00099282
-CVaR,0.02,200,case02,preferred,Path-exp,Path-exp,worker_022_task_010,0.00089816
-Expected,0.02,200,case02,preferred,Combinatorial,Combinatorial,worker_022_task_005,0.0
-MeanCVaR,0.02,200,case02,preferred,Path-exp,Path-exp,worker_022_task_016,0.00061625
-CVaR,0.02,200,case03,no certified method,Path-exp,,,0.03881315
-Expected,0.02,200,case03,preferred,Combinatorial,Combinatorial,worker_023_task_005,0.0
-MeanCVaR,0.02,200,case03,preferred,Path-exp,Path-exp,worker_023_task_016,0.00099812
-CVaR,0.02,200,case04,no certified method,Path-exp,,,0.01917146
-Expected,0.02,200,case04,preferred,Combinatorial,Combinatorial,worker_024_task_005,0.0
-MeanCVaR,0.02,200,case04,preferred,Path-exp,Path-exp,worker_024_task_016,0.00033557
-CVaR,0.02,400,case00,no certified method,Path-exp,,,0.05799958
-Expected,0.02,400,case00,preferred,Combinatorial,Combinatorial,worker_035_task_005,0.0
-MeanCVaR,0.02,400,case00,no certified method,Path-exp,,,0.02910046
-CVaR,0.02,400,case01,no certified method,Path-exp,,,0.06908453
-Expected,0.02,400,case01,preferred,Combinatorial,Combinatorial,worker_036_task_005,0.0
-MeanCVaR,0.02,400,case01,no certified method,Path-exp,,,0.06142543
-CVaR,0.02,400,case02,no certified method,Path-exp,,,0.03373308
-Expected,0.02,400,case02,preferred,Combinatorial,Combinatorial,worker_037_task_005,0.0
-MeanCVaR,0.02,400,case02,no certified method,Path-exp,,,0.02295522
-CVaR,0.02,400,case03,no certified method,Path-exp,,,0.0823262
-Expected,0.02,400,case03,preferred,Combinatorial,Combinatorial,worker_038_task_005,0.0
-MeanCVaR,0.02,400,case03,no certified method,Path-exp,,,0.07258019
-CVaR,0.02,400,case04,no certified method,Path-exp,,,0.05906751
-Expected,0.02,400,case04,preferred,Combinatorial,Combinatorial,worker_039_task_005,0.0
-MeanCVaR,0.02,400,case04,no certified method,Path-exp,,,0.05465387
-CVaR,0.03,100,case00,no certified method,Path-exp,,,0.0559523
-Expected,0.03,100,case00,certified substitute,Combinatorial,SAA,worker_010_task_000,0.0
-MeanCVaR,0.03,100,case00,preferred,Path-exp,Path-exp,worker_010_task_016,0.0009997
-CVaR,0.03,100,case01,no certified method,Path-exp,,,0.04427569
-Expected,0.03,100,case01,preferred,Combinatorial,Combinatorial,worker_011_task_005,0.00062775
-MeanCVaR,0.03,100,case01,preferred,Path-exp,Path-exp,worker_011_task_016,0.00099946
-CVaR,0.03,100,case02,no certified method,Path-exp,,,0.04756935
-Expected,0.03,100,case02,preferred,Combinatorial,Combinatorial,worker_012_task_005,0.0
-MeanCVaR,0.03,100,case02,preferred,Path-exp,Path-exp,worker_012_task_016,0.00022869
-CVaR,0.03,100,case03,no certified method,Path-exp,,,0.03661556
-Expected,0.03,100,case03,preferred,Combinatorial,Combinatorial,worker_013_task_005,0.0
-MeanCVaR,0.03,100,case03,preferred,Path-exp,Path-exp,worker_013_task_016,0.00099882
-CVaR,0.03,100,case04,no certified method,Path-exp,,,0.08101653
-Expected,0.03,100,case04,preferred,Combinatorial,Combinatorial,worker_014_task_005,0.0
-MeanCVaR,0.03,100,case04,no certified method,Path-exp,,,0.03133482
-CVaR,0.03,200,case00,no certified method,Path-exp,,,0.05999296
-Expected,0.03,200,case00,preferred,Combinatorial,Combinatorial,worker_025_task_005,0.00077175
-MeanCVaR,0.03,200,case00,no certified method,Path-exp,,,0.0256978
-CVaR,0.03,200,case01,no certified method,Path-exp,,,0.06085038
-Expected,0.03,200,case01,certified substitute,Combinatorial,SAA,worker_026_task_000,0.0
-MeanCVaR,0.03,200,case01,no certified method,Path-exp,,,0.03706122
-CVaR,0.03,200,case02,no certified method,Path-exp,,,0.06843314
-Expected,0.03,200,case02,preferred,Combinatorial,Combinatorial,worker_027_task_005,0.0
-MeanCVaR,0.03,200,case02,preferred,Path-exp,Path-exp,worker_027_task_016,0.00085231
-CVaR,0.03,200,case03,no certified method,Path-exp,,,0.08032734
-Expected,0.03,200,case03,preferred,Combinatorial,Combinatorial,worker_028_task_005,0.0
-MeanCVaR,0.03,200,case03,no certified method,Path-exp,,,0.02165325
-CVaR,0.03,200,case04,no certified method,Path-exp,,,0.07216725
-Expected,0.03,200,case04,preferred,Combinatorial,Combinatorial,worker_029_task_005,3.25e-06
-MeanCVaR,0.03,200,case04,no certified method,Path-exp,,,0.04971197
-CVaR,0.03,400,case00,no certified method,Path-exp,,,0.06141729
-Expected,0.03,400,case00,preferred,Combinatorial,Combinatorial,worker_040_task_005,0.00042916
-MeanCVaR,0.03,400,case00,no certified method,Path-exp,,,0.06845979
-CVaR,0.03,400,case01,no certified method,Path-exp,,,0.12402051
-Expected,0.03,400,case01,preferred,Combinatorial,Combinatorial,worker_041_task_005,0.0
-MeanCVaR,0.03,400,case01,no certified method,Path-exp,,,0.09505546
-CVaR,0.03,400,case02,no certified method,Path-exp,,,0.06940852
-Expected,0.03,400,case02,preferred,Combinatorial,Combinatorial,worker_042_task_005,0.0
-MeanCVaR,0.03,400,case02,no certified method,Path-exp,,,0.09599741
-CVaR,0.03,400,case03,no certified method,Path-exp,,,0.07961074
-Expected,0.03,400,case03,preferred,Combinatorial,Combinatorial,worker_043_task_005,0.0
-MeanCVaR,0.03,400,case03,no certified method,Path-exp,,,0.0729823
-CVaR,0.03,400,case04,no certified method,Path-exp,,,0.0906837
-Expected,0.03,400,case04,preferred,Combinatorial,Combinatorial,worker_044_task_005,0.0
-MeanCVaR,0.03,400,case04,no certified method,Path-exp,,,0.06286323
+objective,alpha,train_count,case_id,preferred_method,preferred_task_id,preferred_certified,preferred_final_gap,other_certified_methods,best_available_final_gap
+CVaR,0.01,100,case00,Path-exp,worker_000_task_010,True,0.00088425,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+Expected,0.01,100,case00,Combinatorial,worker_000_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,100,case00,Path-exp,worker_000_task_016,True,0.0,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+CVaR,0.01,100,case01,Path-exp,worker_001_task_010,True,0.00086606,Combinatorial;Coverage-exp;Root;SAA;Standard,0.00029454
+Expected,0.01,100,case01,Combinatorial,worker_001_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,100,case01,Path-exp,worker_001_task_016,True,0.00098968,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+CVaR,0.01,100,case02,Path-exp,worker_002_task_010,True,0.0,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+Expected,0.01,100,case02,Combinatorial,worker_002_task_005,True,0.00021987,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,100,case02,Path-exp,worker_002_task_016,True,0.0,Coverage-exp;Root;SAA;Standard,0.0
+CVaR,0.01,100,case03,Path-exp,worker_003_task_010,True,0.00057298,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+Expected,0.01,100,case03,Combinatorial,worker_003_task_005,True,0.00032782,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,100,case03,Path-exp,worker_003_task_016,True,0.0,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+CVaR,0.01,100,case04,Path-exp,worker_004_task_010,True,0.0,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+Expected,0.01,100,case04,Combinatorial,worker_004_task_005,True,0.00046138,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,100,case04,Path-exp,worker_004_task_016,True,0.00029458,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+CVaR,0.01,200,case00,Path-exp,worker_015_task_010,True,0.0,Combinatorial;Coverage-exp;Root;Standard,0.0
+Expected,0.01,200,case00,Combinatorial,worker_015_task_005,True,0.0001494,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,200,case00,Path-exp,worker_015_task_016,True,0.0,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+CVaR,0.01,200,case01,Path-exp,worker_016_task_010,True,0.00097005,Combinatorial;Coverage-exp;Root;Standard,0.0
+Expected,0.01,200,case01,Combinatorial,worker_016_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,200,case01,Path-exp,worker_016_task_016,True,0.00078401,Combinatorial;Coverage-exp;Root;Standard,0.00071662
+CVaR,0.01,200,case02,Path-exp,worker_017_task_010,True,0.00080495,Combinatorial;Coverage-exp;Root;Standard,0.0
+Expected,0.01,200,case02,Combinatorial,worker_017_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,200,case02,Path-exp,worker_017_task_016,True,0.00074212,Combinatorial;Coverage-exp;Root;Standard,0.0
+CVaR,0.01,200,case03,Path-exp,worker_018_task_010,True,0.00069543,Combinatorial;Coverage-exp;Root;Standard,0.00028034
+Expected,0.01,200,case03,Combinatorial,worker_018_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,200,case03,Path-exp,worker_018_task_016,True,0.00071726,Combinatorial;Coverage-exp;Root;Standard,0.00012132
+CVaR,0.01,200,case04,Path-exp,worker_019_task_010,True,0.00096511,Combinatorial;Coverage-exp;Root;Standard,0.00093819
+Expected,0.01,200,case04,Combinatorial,worker_019_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,200,case04,Path-exp,worker_019_task_016,True,0.0008461,Combinatorial;Coverage-exp;Root;SAA;Standard,0.0
+CVaR,0.01,400,case00,Path-exp,worker_030_task_010,True,0.00088885,Combinatorial;Coverage-exp;Root;Standard,0.00070232
+Expected,0.01,400,case00,Combinatorial,worker_030_task_005,True,0.0,Coverage-exp;Path-exp;Root;Standard,0.0
+MeanCVaR,0.01,400,case00,Path-exp,worker_030_task_016,True,0.00095247,Combinatorial;Coverage-exp;Root;Standard,0.0
+CVaR,0.01,400,case01,Path-exp,worker_031_task_010,True,0.00099937,Combinatorial;Coverage-exp;Root;Standard,0.00086895
+Expected,0.01,400,case01,Combinatorial,worker_031_task_005,True,8.02e-05,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,400,case01,Path-exp,worker_031_task_016,True,0.00088135,Combinatorial;Coverage-exp;Root;Standard,0.0
+CVaR,0.01,400,case02,Path-exp,worker_032_task_010,True,0.00095148,Combinatorial;Coverage-exp;Root;Standard,0.00013242
+Expected,0.01,400,case02,Combinatorial,worker_032_task_005,True,0.0,Coverage-exp;Path-exp;Root;Standard,0.0
+MeanCVaR,0.01,400,case02,Path-exp,worker_032_task_016,True,0.00071584,Combinatorial;Coverage-exp;Root;Standard,0.0
+CVaR,0.01,400,case03,Path-exp,worker_033_task_010,True,0.00074943,Combinatorial;Coverage-exp;Root;Standard,0.0
+Expected,0.01,400,case03,Combinatorial,worker_033_task_005,True,0.0,Coverage-exp;Path-exp;Root;Standard,0.0
+MeanCVaR,0.01,400,case03,Path-exp,worker_033_task_016,True,0.00065159,Combinatorial;Coverage-exp;Root;Standard,0.0
+CVaR,0.01,400,case04,Path-exp,worker_034_task_010,True,0.00093084,Combinatorial;Coverage-exp;Root;Standard,0.0
+Expected,0.01,400,case04,Combinatorial,worker_034_task_005,True,0.00029397,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.01,400,case04,Path-exp,worker_034_task_016,True,0.00091468,Combinatorial;Coverage-exp;Root;Standard,0.00040634
+CVaR,0.02,100,case00,Path-exp,worker_005_task_010,True,0.00099974,Combinatorial,0.00097512
+Expected,0.02,100,case00,Combinatorial,worker_005_task_005,True,0.00012849,Coverage-exp;Path-exp;Root;SAA;Standard,0.00012849
+MeanCVaR,0.02,100,case00,Path-exp,worker_005_task_016,True,0.00099632,SAA,0.00097449
+CVaR,0.02,100,case01,Path-exp,worker_006_task_010,True,0.00099908,Combinatorial;Coverage-exp;SAA,0.00095145
+Expected,0.02,100,case01,Combinatorial,worker_006_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,100,case01,Path-exp,worker_006_task_016,True,0.00099952,Combinatorial;Coverage-exp;SAA,0.00067416
+CVaR,0.02,100,case02,Path-exp,worker_007_task_010,True,0.00097714,Coverage-exp,0.00097714
+Expected,0.02,100,case02,Combinatorial,worker_007_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,100,case02,Path-exp,worker_007_task_016,True,0.0009955,Combinatorial;Coverage-exp;SAA;Standard,0.00067408
+CVaR,0.02,100,case03,Path-exp,worker_008_task_010,True,0.00095039,Combinatorial;Coverage-exp;Standard,0.00092501
+Expected,0.02,100,case03,Combinatorial,worker_008_task_005,True,0.00098335,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,100,case03,Path-exp,worker_008_task_016,True,0.00097238,Combinatorial;Coverage-exp;SAA;Standard,0.00078547
+CVaR,0.02,100,case04,Path-exp,worker_009_task_010,False,0.05513348,,0.05513348
+Expected,0.02,100,case04,Combinatorial,worker_009_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,100,case04,Path-exp,worker_009_task_016,True,0.0009969,,0.0009969
+CVaR,0.02,200,case00,Path-exp,worker_020_task_010,False,0.00596683,,0.00596683
+Expected,0.02,200,case00,Combinatorial,worker_020_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,200,case00,Path-exp,worker_020_task_016,True,0.00099549,Combinatorial;Coverage-exp;SAA,0.00064372
+CVaR,0.02,200,case01,Path-exp,worker_021_task_010,True,0.00099315,,0.00099315
+Expected,0.02,200,case01,Combinatorial,worker_021_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,200,case01,Path-exp,worker_021_task_016,True,0.00099955,Coverage-exp,0.00099282
+CVaR,0.02,200,case02,Path-exp,worker_022_task_010,True,0.00095946,Combinatorial;Coverage-exp,0.00089816
+Expected,0.02,200,case02,Combinatorial,worker_022_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,200,case02,Path-exp,worker_022_task_016,True,0.00099884,Combinatorial;Coverage-exp,0.00061625
+CVaR,0.02,200,case03,Path-exp,worker_023_task_010,False,0.03881315,,0.03881315
+Expected,0.02,200,case03,Combinatorial,worker_023_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,200,case03,Path-exp,worker_023_task_016,True,0.00099812,,0.00099812
+CVaR,0.02,200,case04,Path-exp,worker_024_task_010,False,0.0302633,,0.01917146
+Expected,0.02,200,case04,Combinatorial,worker_024_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,200,case04,Path-exp,worker_024_task_016,True,0.00099828,Combinatorial,0.00033557
+CVaR,0.02,400,case00,Path-exp,worker_035_task_010,False,0.06008782,,0.05799958
+Expected,0.02,400,case00,Combinatorial,worker_035_task_005,True,0.0,Path-exp;SAA,0.0
+MeanCVaR,0.02,400,case00,Path-exp,worker_035_task_016,False,0.02910046,,0.02910046
+CVaR,0.02,400,case01,Path-exp,worker_036_task_010,False,0.06908453,,0.06908453
+Expected,0.02,400,case01,Combinatorial,worker_036_task_005,True,0.0,Path-exp;SAA,0.0
+MeanCVaR,0.02,400,case01,Path-exp,worker_036_task_016,False,0.06142543,,0.06142543
+CVaR,0.02,400,case02,Path-exp,worker_037_task_010,False,0.04393765,,0.03373308
+Expected,0.02,400,case02,Combinatorial,worker_037_task_005,True,0.0,Coverage-exp;Path-exp;SAA,0.0
+MeanCVaR,0.02,400,case02,Path-exp,worker_037_task_016,False,0.03915798,,0.02295522
+CVaR,0.02,400,case03,Path-exp,worker_038_task_010,False,0.0823262,,0.0823262
+Expected,0.02,400,case03,Combinatorial,worker_038_task_005,True,0.0,Path-exp;SAA,0.0
+MeanCVaR,0.02,400,case03,Path-exp,worker_038_task_016,False,0.07258019,,0.07258019
+CVaR,0.02,400,case04,Path-exp,worker_039_task_010,False,0.06958775,,0.05906751
+Expected,0.02,400,case04,Combinatorial,worker_039_task_005,True,0.0,Coverage-exp;Path-exp;Root;SAA;Standard,0.0
+MeanCVaR,0.02,400,case04,Path-exp,worker_039_task_016,False,0.06436331,,0.05465387
+CVaR,0.03,100,case00,Path-exp,worker_010_task_010,False,0.0559523,,0.0559523
+Expected,0.03,100,case00,Combinatorial,worker_010_task_005,False,0.03080024,Coverage-exp;Path-exp;SAA,0.0
+MeanCVaR,0.03,100,case00,Path-exp,worker_010_task_016,True,0.0009997,,0.0009997
+CVaR,0.03,100,case01,Path-exp,worker_011_task_010,False,0.04427569,,0.04427569
+Expected,0.03,100,case01,Combinatorial,worker_011_task_005,True,0.00062775,Coverage-exp;Path-exp;SAA,0.00062775
+MeanCVaR,0.03,100,case01,Path-exp,worker_011_task_016,True,0.00099946,,0.00099946
+CVaR,0.03,100,case02,Path-exp,worker_012_task_010,False,0.04756935,,0.04756935
+Expected,0.03,100,case02,Combinatorial,worker_012_task_005,True,0.0,Coverage-exp;Path-exp;SAA,0.0
+MeanCVaR,0.03,100,case02,Path-exp,worker_012_task_016,True,0.00099538,Coverage-exp;SAA,0.00022869
+CVaR,0.03,100,case03,Path-exp,worker_013_task_010,False,0.03661556,,0.03661556
+Expected,0.03,100,case03,Combinatorial,worker_013_task_005,True,0.0,Coverage-exp;Path-exp;SAA,0.0
+MeanCVaR,0.03,100,case03,Path-exp,worker_013_task_016,True,0.00099882,,0.00099882
+CVaR,0.03,100,case04,Path-exp,worker_014_task_010,False,0.08101653,,0.08101653
+Expected,0.03,100,case04,Combinatorial,worker_014_task_005,True,0.0,Coverage-exp;Path-exp;SAA,0.0
+MeanCVaR,0.03,100,case04,Path-exp,worker_014_task_016,False,0.03133482,,0.03133482
+CVaR,0.03,200,case00,Path-exp,worker_025_task_010,False,0.05999296,,0.05999296
+Expected,0.03,200,case00,Combinatorial,worker_025_task_005,True,0.00077175,Coverage-exp;Path-exp;SAA,0.00077175
+MeanCVaR,0.03,200,case00,Path-exp,worker_025_task_016,False,0.0286824,,0.0256978
+CVaR,0.03,200,case01,Path-exp,worker_026_task_010,False,0.06085038,,0.06085038
+Expected,0.03,200,case01,Combinatorial,worker_026_task_005,False,0.04000649,Path-exp;SAA,0.0
+MeanCVaR,0.03,200,case01,Path-exp,worker_026_task_016,False,0.04527874,,0.03706122
+CVaR,0.03,200,case02,Path-exp,worker_027_task_010,False,0.06843314,,0.06843314
+Expected,0.03,200,case02,Combinatorial,worker_027_task_005,True,0.0,Coverage-exp;Path-exp;SAA,0.0
+MeanCVaR,0.03,200,case02,Path-exp,worker_027_task_016,True,0.00099947,Combinatorial,0.00085231
+CVaR,0.03,200,case03,Path-exp,worker_028_task_010,False,0.08032734,,0.08032734
+Expected,0.03,200,case03,Combinatorial,worker_028_task_005,True,0.0,Path-exp;SAA,0.0
+MeanCVaR,0.03,200,case03,Path-exp,worker_028_task_016,False,0.02913264,,0.02165325
+CVaR,0.03,200,case04,Path-exp,worker_029_task_010,False,0.08954189,,0.07216725
+Expected,0.03,200,case04,Combinatorial,worker_029_task_005,True,3.25e-06,SAA,3.25e-06
+MeanCVaR,0.03,200,case04,Path-exp,worker_029_task_016,False,0.04971197,,0.04971197
+CVaR,0.03,400,case00,Path-exp,worker_040_task_010,False,0.0883589,,0.06141729
+Expected,0.03,400,case00,Combinatorial,worker_040_task_005,True,0.00064701,SAA,0.00042916
+MeanCVaR,0.03,400,case00,Path-exp,worker_040_task_016,False,0.08894099,,0.06845979
+CVaR,0.03,400,case01,Path-exp,worker_041_task_010,False,0.12402051,,0.12402051
+Expected,0.03,400,case01,Combinatorial,worker_041_task_005,True,0.00067971,SAA,0.0
+MeanCVaR,0.03,400,case01,Path-exp,worker_041_task_016,False,0.10178614,,0.09505546
+CVaR,0.03,400,case02,Path-exp,worker_042_task_010,False,0.06940852,,0.06940852
+Expected,0.03,400,case02,Combinatorial,worker_042_task_005,True,0.00073385,SAA,0.0
+MeanCVaR,0.03,400,case02,Path-exp,worker_042_task_016,False,0.09599741,,0.09599741
+CVaR,0.03,400,case03,Path-exp,worker_043_task_010,False,0.07961074,,0.07961074
+Expected,0.03,400,case03,Combinatorial,worker_043_task_005,True,0.00094907,SAA,0.0
+MeanCVaR,0.03,400,case03,Path-exp,worker_043_task_016,False,0.07649668,,0.0729823
+CVaR,0.03,400,case04,Path-exp,worker_044_task_010,False,0.1239274,,0.0906837
+Expected,0.03,400,case04,Combinatorial,worker_044_task_005,True,0.00096248,SAA,0.0
+MeanCVaR,0.03,400,case04,Path-exp,worker_044_task_016,False,0.10860538,,0.06286323
