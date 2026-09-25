@@ -1,191 +1,76 @@
-\section{Computational methodology and provenance}
-\label{sec:computational}
+\section{Computational experiments}\label{sec:computational}
 
-We distinguish the \texttt{fpp\_new20x20\_scaling} campaign from the
-\texttt{fpp\_projected\_llbi\_scaling} campaign on \texttt{Sub20}. The
-principal numerical panel uses only the reduced \texttt{new20x20} rows of
-the first campaign. Its Reburn rows are incomplete and cannot be used as
-a paired evaluation. The second campaign is reported separately because
-it uses another landscape, different samples and additional methods. A
-third, paired sensitivity experiment compares the two combinatorial
-scenario orders on 100 and 200 training scenarios; it is not pooled with
-either panel. For reproducibility, \texttt{analysis/reproduce\_results.py}
-and \texttt{analysis/reproduce\_combinatorial\_order.py} reconstruct the
-reported tables from committed batch files in the implementation
-repository.
+\subsection{Experimental design and evaluation protocol}\label{sec:compared}
 
-\subsection{Recorded design and graph classification}
+We ask three distinct questions: how the algorithms solve the sampled
+reduced-graph problem; how a fixed method's solutions generalize as the
+sample size increases; and whether those same placements retain their
+predicted protection on the full propagation graphs. Only the first
+question can be answered numerically from the recoverable target
+campaign. Sections~\ref{sec:oos-stability} and~\ref{sec:graph-fidelity}
+specify the latter two estimands and establish precisely why they
+cannot be estimated from its committed artifacts.
 
-The \texttt{new20x20} manifest declares a 400-cell landscape,
-$\alpha\in\{0.01,0.02,0.03\}$, four training sample sizes
-$n\in\{100,200,400,800\}$ and five replications per configuration.
-It includes both \texttt{shortest\_path} and \texttt{reburn\_all\_paths}
-inputs, each with three objectives and six methods per objective: 2,160
-planned runs in all. For every recorded method comparison within an
-instance, budget, objective and replication, the manifest specifies the
-same training and test split files. Training identifiers are drawn from
-1--9000 and the fixed 1,000 test identifiers are 9001--10000. The
-recorded solver limit is 1,800 seconds, requested relative MIP gap
-$10^{-3}$ and one thread. CVaR uses $\beta=0.9$; mean--CVaR uses
-$\lambda=0.5$. These are manifest settings, not inferences from the
-launcher's defaults. The committed result contains only $n=100,200,400$
-for the reduced landscape; no $n=800$ solve is claimed.
-
-The preflight file reports graph classes for 10,000 reduced
-\texttt{20x20} scenario IDs: 12.41\% rooted arborescences, 86.83\%
-acyclic DAGs that are not trees, and 0.76\% empty or invalid. The
-corresponding Reburn ratios include 94.26\% general directed graphs.
-These classifications refer to the preflight output, not to independent
-reconstruction from the unavailable \texttt{new\_instances/20x20} and
-\texttt{new\_instances/20x20\_reburn} arc and ignition files. In
-particular, identical cell sets and ignition IDs, and the purported
-reduced-to-Reburn arc inclusion, have not been independently checked.
-The tree-only identity \eqref{eq:tree-equality} therefore cannot explain
-the performance of the predominantly DAG reduced panel in general.
-
-The separate \texttt{Sub20} manifest contains 1,440 runs on a Canadian
-FBP landscape: the same three budgets, $n=100,200,400,800$, five
-replications, three objectives and eight methods per objective. It has
-200 test scenarios per run, the same 1,800-second limit, $10^{-3}$
-requested gap and one thread. Its run-level graph classifications also
-include many DAGs. Neither its test set nor its results are pooled with
-\texttt{new20x20}. No completed \texttt{new40x40} run is in the two
-campaigns under analysis.
-
-\subsection{Compared methods and measurements}\label{sec:compared}
-
-Table~\ref{tab:methods} lists the six configurations per objective in
-the \texttt{new20x20} manifest (18 labels). \texttt{RootCuts} uses
-LP-dual root user cuts in addition to lazy optimality cuts at integer
-candidates. The standard LLBI is an initial structural inequality;
-\texttt{exp} denotes root separation of the projected family. The
-manifest records up to ten projected separation rounds and 100 cuts per
-round, with a $10^{-6}$ violation tolerance. These are configured
-ceilings and do not assert that each run attained them. The path
-separator enumerates a limited number of paths per node (default eight
-in the implementation); the manifest does not record a per-run override
-of that path cap. The combinatorial method has its own cut construction
-and candidate checks; its 0.10 initial sampling fraction does not allow
-an unchecked candidate to be accepted. The panel has one combinatorial
-configuration and has no projected \texttt{poly} variants. The separate
-order-sensitivity experiment described below does not add a seventh
-method or alter any denominator in the 810-run panel.
+The principal panel uses the 400-cell \texttt{new20x20} landscape and
+its \texttt{shortest\_path} reduced propagation graphs. Its manifest
+specifies training sizes $n\in\{100,200,400\}$, firebreak budget
+fractions $\alpha\in\{0.01,0.02,0.03\}$, five independently generated
+training samples per $(n,\alpha)$ configuration, and expected loss,
+CVaR at confidence level $\beta=0.9$, and mean--CVaR with weight
+$\lambda=0.5$. For each objective the same six configurations solve
+each sampled problem, yielding $3\times3\times5\times3\times6=810$
+recorded reduced-graph runs. The manifest specifies one thread, a
+1,800\,s time limit, and requested relative MIP gap $10^{-3}$. The
+preflight classifies 86.83\% of reduced scenarios as non-tree acyclic
+DAGs, 12.41\% as rooted arborescences, and 0.76\% as empty or invalid;
+these classifications have not been independently recreated from the
+unavailable source graphs.
 
 \begin{center}
-\begin{minipage}{0.97\linewidth}\centering\small
-\captionof{table}{Methods actually present for each of the three risk
-objectives in the reduced \texttt{new20x20} panel. \texttt{Sub20} adds
-Coverage-poly and Path-poly and is analyzed separately.}
+\begin{minipage}{0.96\linewidth}\centering\small
+\captionof{table}{Six configurations matched within each sampled problem.
+The three objectives use the corresponding exact labels in the manifest;
+these are abbreviated consistently in the numerical tables.}
 \label{tab:methods}
-\begin{tabular}{p{0.42\linewidth}p{0.48\linewidth}}
+\begin{tabular}{p{0.37\linewidth}p{0.54\linewidth}}
 \toprule
 Displayed name & Configuration \\
 \midrule
-Extensive SAA & Binary-burn extensive MIP. \\
-LP B\&B + Root & LP-dual candidate and root cuts. \\
-LP B\&B + Standard & Root cuts and initial standard LLBI. \\
-LP B\&B + Coverage-exp & Root cuts and projected coverage separation. \\
-LP B\&B + Path-exp & Root cuts and projected stored-path separation. \\
-Combinatorial B\&B & Combinatorial candidate cuts and configured initial and fractional cuts. \\
+Extensive SAA & Extensive MIP with binary burn variables. \\
+LP B\&B + Root & LP recourse cuts at integer candidates and LP-dual root cuts. \\
+LP B\&B + Standard & Root cuts plus the initial standard LLBI. \\
+LP B\&B + Coverage-exp & Root cuts and separated projected coverage inequalities. \\
+LP B\&B + Path-exp & Root cuts and separated projected stored-path inequalities. \\
+Combinatorial B\&B & Combinatorial candidate cuts with configured initial and fractional cuts. \\
 \bottomrule
 \end{tabular}
 \end{minipage}
 \end{center}
 
-The \texttt{new20x20} consolidated file has 1,329 rows but a malformed
-132-column header: the last ten headings are blank, and fields from
-\texttt{selected\_firebreaks} onward are displaced. The individual
-worker CSV, JSON, solution files and intact full consolidated CSV named
-by the manifest are absent from the committed results. Thus our tables
-use only the uniquely named, verified fields \emph{before}
-\texttt{selected\_firebreaks}: identifiers, split and configuration
-metadata matched to the manifest, status, solver time, final gap and
-pre-existing cut diagnostics. They make no claim about the displaced
-placements, training or test evaluation fields, hardware or effective
-solver version. The separate \texttt{Sub20} consolidated file has a
-consistent 230-column header and explicit validation statuses.
+Within a block, methods share the objective, budget, training split and
+fixed test split. Training IDs lie in 1--9000; all test splits contain
+exactly IDs 9001--10000. The reduced and Reburn \emph{training} splits
+are different and are never treated as paired optimizations. The
+campaign's consolidated file contains 1,329 records, including 810
+reduced rows and 519 excluded Reburn rows. Its fields starting at
+\texttt{selected\_firebreaks} are displaced or truncated. The target
+campaign's original worker JSON, solution files, intact worker CSVs
+and scenario graph inputs are absent from this repository and its
+accessible history. Therefore the solver statistics below use only
+individually identified fields preceding this damaged suffix. Later
+intact campaigns solve different designs and cannot repair these
+particular missing records.
 
-A run contributes to $N_{\rm opt}$ only if its status is
-\texttt{Optimal} and its final relative gap is at most $10^{-3}$.
-We call this resolved to the requested tolerance; it is not necessarily
-a proof of zero gap. We report $N_{\rm opt}/N$, where $N=45$ per
-objective and method, or $N=15$ when conditioning on either training
-size or budget. For any such set of runs $I$, with recorded relative
-gaps $g_i$ and solver times $t_i$, the reported summaries are
-\[
- \overline g_I=\frac{100}{|I|}\sum_{i\in I}g_i,\qquad
- g_I^{\max}=100\max_{i\in I}g_i,\qquad
- \overline t_I=\frac{1}{|I|}\sum_{i\in I}t_i,\qquad
- s_{t,I}=\sqrt{\frac{\sum_{i\in I}(t_i-\overline t_I)^2}{|I|-1}}.
-\]
-Gap summaries are percentages; time means and sample standard
-deviations are seconds. All recorded runs in the set enter every
-summary. Positive gaps of certified runs are retained. Recorded times
-of time-limited runs are neither discarded nor replaced by 1,800\,s,
-including any recorded overrun. These observed computational times
-describe resource consumption under the stopping rule. Because time
-to certification is censored for runs without certification, their
-mean is not an estimate of unrestricted time to optimality and must
-be interpreted jointly with $N_{\rm opt}/N$ and the gap summaries.
-The fraction resolved by each time in Fig.~\ref{fig:new20-certified}
-uses a common denominator of 45 per objective and method; time-limited
-runs remain unresolved at the 1,800-second horizon.
-
-\subsection{Paired combinatorial-order sensitivity}
-\label{sec:order-design}
-
-The order experiment uses only the combinatorial \texttt{new20x20} rows
-with $n\in\{100,200\}$ from two campaigns under \path{Results_server}.
-The legacy \path{fpp_new_instances_scaling} directory supplies 90 runs
-of the base combinatorial labels. Its CSV, manifest and JSON files do
-not record the order field. We therefore label these runs $\eta$-asc as
-an inference: the recoverable implementation declares ascending order
-as its default, the manifest generator assigns $\eta$-asc to base labels,
-and the implementation documentation says this default preserves the
-previous behavior. This evidence does not identify the exact executable
-commit used by that campaign. The directory
-\path{fpp_new_instances_scaling_new20x20_100_200} supplies 90
-$\eta$-desc runs; descending order is explicit in its method labels,
-manifest, consolidated CSV and worker JSON files.
-
-Pairing uses the scientific key consisting of instance, replication,
-$\alpha$, training size and objective, not the reusable task identifier.
-All 90 pairs have byte-identical training and test split files and match
-on the 1,000 test identifiers, graph representation, risk settings,
-1,800-second limit, $10^{-3}$ requested gap, one thread, heuristic
-lifting, 0.10 sampling fraction, initial cuts and fractional separation.
-The design contains three objectives, two training sizes, three budgets
-and five replications: 30 pairs per objective, 15 per objective and
-training size, and 10 per objective and budget. All 180 worker JSON
-records have validation status \texttt{pass}, and their status, gap and
-time fields agree with the consolidated files.
-
-The ascending records are timestamped June 25--26, 2026, whereas the
-descending records are timestamped July 3--4, 2026. Neither campaign
-records the hardware or effective solver version. Certification and
-gap comparisons are therefore paired on their scientific inputs, but
-runtime differences remain observed cross-campaign differences and
-cannot be attributed exclusively to scenario order. The summaries use
-the definitions above with $N=30$, 15 or 10 as appropriate. Results at
-400 or 600 scenarios found elsewhere under \path{Results_server} are
-excluded because their provenance is not reconciled with these two
-paired campaigns; the reproduction script admits only $n=100,200$.
-
-\subsection{Paired graph and held-out evaluation}\label{sec:evaluation}
-
-For a feasible reduced-graph placement $y^D$, the planned paired
-quantity on the \emph{same} scenario IDs is
-\begin{equation}\label{eq:paired-delta}
- \widehat\Delta_{\rm pair}(y^D)
-   =\frac{1}{|\mathcal S_{\rm train}|}
-     \sum_{s\in\mathcal S_{\rm train}}
-         \bigl(Q_s^R(y^D)-Q_s^D(y^D)\bigr).
-\end{equation}
-Its sign is predicted by Proposition~\ref{prop:reduction} only after
-the graph-pair premises have been verified. The current reduced and
-Reburn training partitions differ in all 60 corresponding
-$(\alpha,n,\text{case})$ combinations, despite sharing the fixed test
-set. Their independently optimized objectives cannot be substituted
-for \eqref{eq:paired-delta}. The displaced placement and evaluation
-fields and absent scenario inputs further preclude paired and held-out
-loss estimates in the present revision.
+For any set $I$ of recorded runs, certification requires both the
+\texttt{Optimal} status and reported final relative MIP gap
+$g_i\leq 10^{-3}$. We report $N_{\rm opt}/|I|$, mean and maximum final
+relative MIP gaps in percent, and mean observed solver time
+$|I|^{-1}\sum_{i\in I}t_i$. Every statistic includes unresolved runs;
+positive gaps within the tolerance and recorded time overruns are
+retained. Mean observed runtime is computation consumed under the
+stopping rule, not an estimate of unrestricted time to certification:
+unsuccessful runs are right censored at the stopping horizon. Our
+cumulative certification profiles count certifications by observed
+solver time over a common denominator of 45 per objective and method.
+They are not Dolan--Mor\'e profiles, which would require a reliable
+uncensored paired time-to-solution for every compared case.

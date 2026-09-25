@@ -16,7 +16,6 @@ from math import isfinite
 
 OBJECTIVES = ("Expected", "CVaR", "MeanCVaR")
 METHODS = ("SAA", "Root", "Standard", "Coverage-exp", "Path-exp", "Combinatorial")
-SUB_METHODS = ("Root", "Standard", "Coverage-poly", "Path-poly", "Coverage-exp", "Path-exp", "Combinatorial")
 LATEX = {"Expected": "Expected", "CVaR": "CVaR", "MeanCVaR": "Mean--CVaR"}
 LABEL = {"SAA": "Extensive SAA", "Root": "LP B\\&B + Root", "Standard": "LP B\\&B + Standard",
          "Coverage-poly": "LP B\\&B + Coverage-poly", "Path-poly": "LP B\\&B + Path-poly",
@@ -116,8 +115,8 @@ def verify_new20(base: Path, implementation: Path):
                 split_cache[name] = split(implementation, name)
         assert len(split_cache[training]) == int(group[1]) and len(split_cache[testing]) == 1000
         assert len(set(split_cache[training])) == int(group[1])
-        assert len(set(split_cache[testing])) == 1000
-        assert max(split_cache[training]) <= 9000 and min(split_cache[testing]) >= 9001
+        assert set(split_cache[testing]) == set(range(9001, 10001))
+        assert max(split_cache[training]) <= 9000
         # Objective discrepancies among runs certified to tolerance should be small.
         certified = [float(r["objective_in_sample"]) for r in runs if test_run(r)]
         if len(certified) > 1:
@@ -138,37 +137,6 @@ def verify_new20(base: Path, implementation: Path):
     return groups
 
 
-def verify_sub20(base: Path):
-    campaign = base / "fpp_projected_llbi_scaling"
-    headers, rows = read_csv(campaign / "batch_results_all.csv")
-    assert len(headers) == len(set(headers)) == 230 and len(rows) == 1440
-    _, manifest = read_csv(campaign / "manifests/full_task_manifest.csv")
-    assert len(manifest) == 1440
-    tasks = {r["task_id"]: r for r in manifest}
-    assert len(tasks) == len(manifest)
-    groups = defaultdict(list)
-    for r in rows:
-        m = tasks[r["task_id"]]
-        for field in ("alpha", "train_count", "test_count", "case_id", "objective_family", "method"):
-            assert r[field] == m[field]
-        assert r["landscape"] == m["landscape"] == "Sub20"
-        assert m["threads"] == "1" and r["time_limit"] == m["time_limit"] == "1800"
-        assert m["mip_gap"] == "0.001" and r["test_count"] == "200"
-        assert r["validation_status"] in ("pass", "warn")
-        test_run(r)
-        groups[key(r)].append(r)
-    assert len(groups) == 180
-    for runs in groups.values():
-        assert len(runs) == 8 and {classify(r["method"]) for r in runs} == set(SUB_METHODS) | {"SAA"}
-        assert len({r["train_ids"] for r in runs}) == len({r["test_ids"] for r in runs}) == 1
-    warnings = [r for r in rows if r["validation_status"] == "warn"]
-    assert Counter(r["solver_status"] for r in rows) == {"Optimal": 605, "Feasible": 835}
-    assert len(warnings) == 62 and {classify(r["method"]) for r in warnings} == {"SAA"}
-    assert Counter(r["objective_family"] for r in warnings) == {"CVaR": 50, "MeanCVaR": 7, "Expected": 5}
-    assert all(r["validation_status"] == "pass" for r in rows if classify(r["method"]) != "SAA")
-    return groups
-
-
 def summarize(rr):
     """All recorded runs; gap in percent and sample standard deviation of time."""
     assert len(rr) > 1
@@ -177,7 +145,7 @@ def summarize(rr):
     return (sum(test_run(r) for r in rr), len(rr), mean(gaps), max(gaps), mean(times), stdev(times))
 
 
-def write_tables(groups, subgroups, output: Path):
+def write_tables(groups, output: Path):
     output.mkdir(parents=True, exist_ok=True)
     by_objective = defaultdict(lambda: defaultdict(list))
     for k, runs in groups.items():
@@ -226,13 +194,49 @@ def write_tables(groups, subgroups, output: Path):
         writer = csv.writer(stream)
         writer.writerow(("objective", "method", "alpha", "train_count", "optimal", "total", "mean_gap_pct", "max_gap_pct", "mean_time_s", "sample_sd_time_s"))
         writer.writerows(records)
-    sub = table(r"Method & Expected & CVaR & Mean--CVaR", "lrrr")
-    for method in SUB_METHODS:
-        counts = [sum(test_run(r) for group, runs in subgroups.items() if group[3] == obj
-                      for r in runs if classify(r["method"]) == method) for obj in OBJECTIVES]
-        sub.append(f'{LABEL[method]} & {counts[0]}/60 & {counts[1]}/60 & {counts[2]}/60' + r" \\")
-    finish(sub, "sub20_solved.tex")
     return by_objective
+
+
+def write_selection_audit(groups, output: Path):
+    """Audit whether a certified placement could be selected, without using damaged suffix fields."""
+    preferred = {"Expected": "Combinatorial", "CVaR": "Path-exp", "MeanCVaR": "Path-exp"}
+    records = []
+    for (alpha, n, case, obj), runs in sorted(groups.items()):
+        first = next(r for r in runs if classify(r["method"]) == preferred[obj])
+        certified = [r for r in runs if test_run(r)]
+        if test_run(first):
+            chosen, rule = first, "preferred"
+        elif certified:
+            # An exact same-sample, same-objective substitute: deterministic method order.
+            chosen, rule = min(certified, key=lambda r: METHODS.index(classify(r["method"]))), "certified substitute"
+        else:
+            chosen, rule = None, "no certified method"
+        records.append((obj, alpha, n, case, rule, preferred[obj],
+                        "" if chosen is None else classify(chosen["method"]),
+                        "" if chosen is None else chosen["task_id"],
+                        min(float(r["mip_gap"]) for r in runs)))
+    with (output / "new20_selection_audit.csv").open("w", newline="") as stream:
+        writer = csv.writer(stream, lineterminator="\n")
+        writer.writerow(("objective", "alpha", "train_count", "case_id", "selection_status",
+                         "preferred_method", "selected_method", "selected_task_id", "best_available_final_gap"))
+        writer.writerows(records)
+    assert len(records) == 135
+    assert Counter(row[4] for row in records) == {
+        "preferred": 94, "certified substitute": 2, "no certified method": 39}
+    lines = [r"\begin{tabular}{llrrrr}", r"\toprule",
+             r"Objective & $\alpha$ & $n=100$ & $n=200$ & $n=400$ & Total \\", r"\midrule"]
+    for obj in OBJECTIVES:
+        for alpha in ("0.01", "0.02", "0.03"):
+            subsets = [[r for r in records if r[0] == obj and r[1] == alpha and r[2] == n]
+                       for n in ("100", "200", "400")]
+            assert all(len(x) == 5 for x in subsets)
+            counts = [sum(r[4] != "no certified method" for r in x) for x in subsets]
+            lines.append(f"{LATEX[obj]} & {alpha} & " + " & ".join(f"{x}/5" for x in counts)
+                         + f" & {sum(counts)}/15" + r" \\")
+        if obj != OBJECTIVES[-1]:
+            lines.append(r"\midrule")
+    (output / "new20_selection_coverage.tex").write_text(
+        "\n".join(lines + [r"\bottomrule", r"\end{tabular}"]) + "\n")
 
 
 def write_figure(by_objective, path: Path):
@@ -279,11 +283,11 @@ def main():
     args = parser.parse_args()
     base = args.implementation / "cpp_cplex_firebreak/results/batch"
     groups = verify_new20(base, args.implementation)
-    sub = verify_sub20(base)
-    by_objective = write_tables(groups, sub, args.manuscript / "tables")
+    by_objective = write_tables(groups, args.manuscript / "tables")
+    write_selection_audit(groups, args.manuscript / "tables")
     write_figure(by_objective, args.manuscript / "figs/new20_certified.tex")
-    print("Checked: 810 complete reduced runs, 519 partial Reburn, 1440 Sub20; 60/60 Reburn training splits differ.")
-    print("Wrote seven tables, full statistics CSV and one certified-runtime plot; new20 fields after selected_firebreaks excluded.")
+    print("Checked: 810 complete reduced runs, 519 excluded Reburn rows; 60/60 Reburn training splits differ.")
+    print("Wrote reduced-panel tables, selection audit and certification profile; damaged suffix excluded.")
 
 
 if __name__ == "__main__":

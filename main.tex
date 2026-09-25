@@ -40,30 +40,23 @@
 \cortext[cor1]{Corresponding author}
 
 \begin{abstract}
-Firebreak placement under uncertain ignition and propagation is a stochastic
-network decision problem. Directed Cell2Fire scenario graphs retain alternative
-fire routes but make optimization with many scenarios costly. We optimize
-on reduced shortest-path graphs, predominantly directed acyclic graphs
-rather than trees. Scenario recourse is characterized by reachability,
-giving an optimal integral burn vector and relatively complete recourse.
-We derive downstream, capped-coverage and propagation-path lower bounds:
-the complete path family recovers fractional recourse on directed graphs,
-and complete coverage coincides with it on rooted trees. The matched
-reduced 20-by-20 panel has 810 runs under expected loss, CVaR and
-mean--CVaR. At a 1,800-second limit and requested relative gap $10^{-3}$,
-projected PathLLBI reaches the tolerance in 39, 21 and 30 of 45 cases
-per objective, versus 26, 15 and 15 for the LP-dual root baseline.
-Mean and maximum gaps and observed time means and sample standard
-deviations are reported over all runs. Budget-conditioned results reveal
-objective-dependent certification patterns.
-A separate 180-run paired order sensitivity changes Combinatorial B\&B
-certification from 28/30 to 29/30 under expected loss, 16/30 to 15/30
-under CVaR, and 21/30 to 25/30 under mean--CVaR when moving from
-ascending to descending current recourse estimates.
-An independent 1,440-run Sub20 campaign compares polynomial and separated
-inequalities. Incomplete Reburn data, displaced placement/evaluation
-fields and missing original scenario graphs prevent a validated
-reduced/Reburn loss comparison or claim about placement quality.
+Firebreak placement under uncertain propagation is a stochastic network
+decision problem. We formulate it on reduced directed scenario graphs,
+characterize reachability recourse and derive downstream, coverage and
+path lower bounds. The complete path family recovers fractional recourse
+on directed graphs; complete coverage agrees with it on rooted trees.
+A matched 810-run study on reduced 20-by-20 instances compares six
+configurations under expected loss, CVaR and mean--CVaR. At a 1,800-second
+limit and relative MIP tolerance $10^{-3}$, Combinatorial Branch-and-Benders
+certifies 43/45 expected-loss instances, with mean final gap 0.18\%.
+Projected path inequalities give the strongest recorded outcomes for
+CVaR (21/45 certified; mean gap 3.51\%) and mean--CVaR (30/45; mean
+gap 2.10\%). We report certification, final gaps and observed time
+with all unresolved runs included and examine training-size and budget
+dependence. A run-level audit identifies 24 CVaR and 15 mean--CVaR
+sampled problems without a certified solution from any compared method.
+Missing intact placements and scenario inputs preclude a supported
+out-of-sample stability or paired reduced-to-Reburn fidelity estimate.
 \end{abstract}
 
 \begin{keywords}

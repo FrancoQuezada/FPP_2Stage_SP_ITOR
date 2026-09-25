@@ -50,33 +50,16 @@ checks. The theoretical equality of a \emph{complete} inequality family
 with recourse must not be confused with adding a limited number of root
 cuts \citep{rahmaniani2017benders}.
 
-\subsection{Scenario ordering in combinatorial separation}
-\label{sec:combinatorial-order}
+\subsection{Combinatorial candidate verification}
 
-The combinatorial variant orders scenarios using the current master
-recourse estimates before separation. Let $\bar\eta_s$ be the value of
-$\eta_s$ at the current candidate or relaxation. The policy denoted
-$\eta$-asc visits scenarios in nondecreasing $\bar\eta_s$, whereas
-$\eta$-desc visits them in nonincreasing $\bar\eta_s$; ties are broken
-deterministically by scenario identifier. The same ordering routine is
-called from the integer-candidate and fractional-separation callbacks.
-Thus $\bar\eta_s$ is an optimization-state estimate of recourse, not
-the realized scenario loss and not, by itself, an indicator that
-scenario $s$ belongs to the CVaR tail.
-
-With sampling fraction $r$, the integer-candidate callback initially
-checks the first $\lceil r|\mathcal S|\rceil$ scenarios in this order
-(at least one). A violation in that initial group rejects the candidate
-without processing the remaining scenarios. If no violation is found,
-every remaining scenario is checked before the candidate can be
-accepted. Consequently, changing the order can change when violations
-and cuts are encountered, but not the risk objective, scenario
-probabilities, cut validity or the full-verification acceptance rule.
-Examining large current estimates first is a plausible search heuristic
-for CVaR and mean--CVaR because large recourse values can matter to
-their upper-tail terms. It is not a guarantee: the estimates can be
-inexact, and tail membership also depends on the evolving threshold
-$t$ in \eqref{eq:master}.
+The combinatorial variant checks a configured initial fraction of the
+scenarios at each integer candidate. A detected violation rejects the
+candidate; otherwise every remaining scenario is checked before it
+can be accepted. The configuration also generates initial cuts and
+separates fractional solutions. The initial sampling fraction thus
+changes the work done before rejection, without permitting an
+unchecked candidate to be accepted or changing the sampled risk
+objective.
 
 \subsection{Downstream and capped-coverage bounds}
 \label{sec:coverage}

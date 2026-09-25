@@ -13,7 +13,7 @@ These tables use the same source and reproduction script as
 Table~\ref{tab:new20-gaps-times}. The generated file
 \texttt{tables/new20\_statistics.csv} additionally records statistics
 for every five-run $(\alpha,n)$ block, enabling the within-size
-checks discussed in Section~\ref{sec:alpha-results}.
+checks discussed in Section~\ref{sec:results}.
 
 \begin{center}
 \begin{minipage}{0.98\linewidth}\centering\small
@@ -42,40 +42,5 @@ MIP gaps (\%), and mean observed time and sample SD (s), by budget.}
 MIP gaps (\%), and mean observed time and sample SD (s), by budget.}
 \label{tab:alpha-MeanCVaR}
 \input{tables/new20_alpha_MeanCVaR}
-\end{minipage}
-\end{center}
-
-\clearpage
-\subsection{Combinatorial scenario-order sensitivity}
-
-The following tables disaggregate the independent order experiment in
-Section~\ref{sec:order-results}. Every $n$ row contains 15 runs (three
-budgets and five replications), and every $\alpha$ row contains ten runs
-(two training sizes and five replications). Gap and time definitions are
-those of Section~\ref{sec:compared}; all recorded runs enter the
-statistics. The source campaigns and the inferred versus recorded order
-provenance are documented in Section~\ref{sec:order-design}. No 400- or
-600-scenario result enters either table.
-
-\begin{center}
-\begin{minipage}{0.98\linewidth}\centering\scriptsize
-\setlength{\tabcolsep}{2.5pt}
-\captionof{table}{Combinatorial B\&B order sensitivity by objective and
-training size: $N_{\rm opt}/15$, mean and maximum final MIP gap (\%),
-and mean observed time and sample SD (s).}
-\label{tab:comb-order-n}
-\input{tables/combinatorial_order_by_n}
-\end{minipage}
-\end{center}
-
-\clearpage
-\begin{center}
-\begin{minipage}{0.98\linewidth}\centering\scriptsize
-\setlength{\tabcolsep}{2.5pt}
-\captionof{table}{Combinatorial B\&B order sensitivity by objective and
-budget: $N_{\rm opt}/10$, mean and maximum final MIP gap (\%), and mean
-observed time and sample SD (s).}
-\label{tab:comb-order-alpha}
-\input{tables/combinatorial_order_by_alpha}
 \end{minipage}
 \end{center}
