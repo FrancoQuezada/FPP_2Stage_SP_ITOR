@@ -48,22 +48,18 @@ separation retains only a limited set of paths.
 
 This article contributes a stochastic reachability formulation with
 relatively complete recourse, proofs of the validity and projection of
-structural bounds, and a numerically audited comparison of six methods
-on matched samples. Its 810-run reduced \texttt{new20x20} panel covers
-three objectives, three training sizes and three firebreak budgets.
-Certification profiles, final MIP gaps and observed times identify
-different preferred configurations for expected loss and the two risk
-objectives. We also establish what evidence is necessary to assess
-out-of-sample stability and transfer of a fixed placement to the full
-Reburn graph. The committed campaign does not contain the intact
-placements, scenario graphs or scenario-level evaluations needed to
-estimate these decision-quality quantities. We therefore report the
-computational findings and the decision-study coverage audit without
-claiming unsupported protection benefits.
+structural bounds, and a comparison of six methods on matched samples.
+Its 810-run reduced \texttt{new20x20} panel covers three objectives,
+three training sizes and three firebreak budgets. Certification
+profiles, final MIP gaps and observed times identify distinct strong
+configurations by objective. A complementary decision study uses 135
+Path-exp placements on fixed test scenarios to compare held-out losses
+and firebreak-set similarity across training sizes. The transfer of a
+fixed placement to the full Reburn graph remains a separate question.
 
 Section~\ref{sec:setting} specifies the graphs and conditional reduction
 result; Section~\ref{sec:model} develops the stochastic model and
 recourse. Section~\ref{sec:methods} proves the bound relationships.
 Section~\ref{sec:computational} documents the experimental design,
-computational evidence and decision-evaluation limits, followed by conclusions
-in Section~\ref{sec:conclusions}.
+solver performance and held-out decision results, followed by
+conclusions in Section~\ref{sec:conclusions}.

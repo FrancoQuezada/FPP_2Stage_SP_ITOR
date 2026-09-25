@@ -19,16 +19,17 @@ gap $10^{-3}$ and a 1,800\,s stopping limit. Unresolved runs and
 recorded time overruns enter the gap and time summaries, so their
 mean observed runtime is not unrestricted time to optimality.
 
-A decision-quality conclusion requires more evidence than solver
-certification. At least 24 CVaR and 15 mean--CVaR sampled problems have
-no certified solution from any compared method; the original campaign
-also lacks intact placement and scenario-level evaluation artifacts.
-Consequently, the change in out-of-sample performance and Jaccard
-similarity with sample size remains unmeasured. To assess the reduced
-graph's fidelity, those placements must be evaluated on matched
-reduced and Reburn test scenarios, after verifying original cell IDs,
-ignitions, weights and graph pairing. Neither independently optimized
-Reburn objectives nor the incomplete consolidated suffix provide such
-a comparison. Future work should recover the run artifacts and graph
-inputs, close the outstanding optimization gaps, and then perform this
-fixed-decision paired evaluation.
+A complementary 135-placement Path-exp study evaluates five sampled
+decisions for each objective, size and budget on a fixed 1,000-scenario
+test set. At $\alpha=0.02$, increasing training size from 100 to 400
+reduces mean held-out expected loss from 94.95 to 91.73, CVaR from
+204.00 to 192.76, and mean--CVaR from 155.42 to 143.44 burned cells.
+Placement similarity varies by objective and budget: for example,
+mean pairwise Jaccard similarity under CVaR at $\alpha=0.02$ is
+0.08, 0.27 and 0.22 across the three sizes. These comparisons describe
+the decisions found by Path-exp. At $\alpha=0.03$ and $n=400$ none
+of its CVaR runs and only one of its five mean--CVaR runs is certified,
+so unresolved optimization error limits causal interpretation of the
+risk-objective trends. Evaluating each selected placement on paired
+reduced and full Reburn test graphs would establish whether the
+observed reduced-graph improvements transfer to the full model.

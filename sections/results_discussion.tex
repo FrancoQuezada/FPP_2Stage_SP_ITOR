@@ -15,8 +15,7 @@ and final gap because unresolved runs reached the stopping limit.
 relative MIP gap $10^{-3}$ ($100N_{\rm opt}/N$, $N=45$ per row), mean
 and maximum final relative MIP gaps (\%), and mean observed solver
 time (s). All 45 runs, including uncertified runs and recorded time
-overruns, enter the gap and time statistics. Generated from the 810
-run-level records by \texttt{analysis/reproduce\_results.py}.}
+overruns, enter the gap and time statistics.}
 \label{tab:new20-gaps-times}
 \input{tables/new20_gaps_times}
 \end{minipage}
@@ -43,8 +42,7 @@ computational comparisons, not statements of decision quality.
 \caption{Cumulative certification against observed solver time, one
 panel per objective. Each method has 45 runs in the denominator at
 every time; unresolved runs never enter its curve. This is a
-cumulative certification profile under the 1,800\,s stopping rule,
-reconstructed by \texttt{analysis/reproduce\_results.py}.}
+cumulative certification profile under the 1,800\,s stopping rule.}
 \label{fig:new20-certified}
 \end{figure}
 
@@ -78,61 +76,68 @@ while mean observed time falls from 578.0 to 401.8 and 249.5\,s.
 These associations are descriptive, and times for unresolved runs
 remain censored at the stopping rule.
 
-These comparisons motivate Combinatorial B\&B as the preferred
-expected-loss configuration and Path-exp as the preferred CVaR and
-mean--CVaR configurations for a subsequent decision study. This
-selection is based on certification and final gap, rather than an
-unobserved out-of-sample outcome.
+For the decision study below, we use Path-exp for all three objectives
+to compare the same solution-generation procedure across training
+sizes and budgets. Combinatorial B\&B remains the stronger
+expected-loss configuration in the solver comparison; the common
+Path-exp policy is chosen for comparability, not as an overall winner.
 
 \FloatBarrier
 \subsection{Out-of-sample stability of SAA solutions}\label{sec:oos-stability}
 
-Does increasing $n$ improve both the average held-out objective and
-its variation across the five sampled solutions? The appropriate
-estimand evaluates one selected firebreak set $Y$ on the \emph{same}
-1,000 reduced-graph scenarios for every $n$. For losses $q_s(Y)$ on
-test IDs $s=9001,\ldots,10000$, define
+We evaluate the Path-exp firebreak sets from five independent training
+samples at each $(n,\alpha)$ on the same 1,000 reduced-graph test
+scenarios, indexed by $s=9001,\ldots,10000$. For the loss $q_s(Y)$
+under placement $Y$, define
 \[
  \widehat\mu(Y)=\frac{1}{1000}\sum_s q_s(Y),\qquad
  \widehat C_{0.9}(Y)=\min_{z\in\mathbb R}
  \left\{z+\frac{1}{1000(1-0.9)}\sum_s(q_s(Y)-z)_+\right\}.
 \]
-The three test objectives are respectively $\widehat\mu$,
-$\widehat C_{0.9}$, and $(1-0.5)\widehat\mu+0.5\widehat C_{0.9}$,
-matching the optimization settings. Variation across the five
-replications at each $(n,\alpha)$ should be reported, for example as
-sample standard deviation, alongside the mean. Decision stability
-requires the ten pairwise Jaccard similarities
-$|Y_a\cap Y_b|/|Y_a\cup Y_b|$ within each five-replication group.
-The training splits are independently generated at different sizes,
-not nested: for example, \texttt{case00} at $\alpha=0.01$ shares only
-four IDs between its 100- and 200-scenario training sets. Cross-size
-\texttt{case\_id} therefore does not establish a paired design.
+The three reported test objectives are $\widehat\mu$,
+$\widehat C_{0.9}$, and $0.5\widehat\mu+0.5\widehat C_{0.9}$.
+Table~\ref{tab:new20-oos-stability} gives their means and sample
+standard deviations over the five placements. Placement similarity
+uses the original cell IDs and the ten within-group Jaccard indices
+$J(Y_a,Y_b)=|Y_a\cap Y_b|/|Y_a\cup Y_b|$. The ten indices summarize
+five sampled placements and are not independent replications.
+Training samples at different $n$ are independently drawn, so the
+comparisons across sizes are descriptive rather than paired by case.
 
-Combinatorial B\&B would be the preselected solution method for
-expected loss, and Path-exp for CVaR and mean--CVaR, based solely on
-Section~\ref{sec:results}. Using Path-exp across all objectives would
-reduce expected-loss certification from 43/45 to 39/45, without
-resolving its 24 uncertified CVaR or 15 uncertified mean--CVaR
-problems. No placements are substituted across methods in this
-decision analysis. Before attributing variation in held-out values
-to sampling, unresolved sampled problems would need comparable
-optimization accuracy. The task-level gaps and availability of
-certified alternatives are recorded in
-\texttt{tables/new20\_selection\_audit.csv}; this audit does not
-measure held-out performance.
+\begin{table}[p]
+\centering\footnotesize
+\setlength{\tabcolsep}{4pt}
+\caption{Held-out burned-area objective and placement similarity for
+Path-exp. Each mean and sample SD uses five firebreak sets evaluated on
+the fixed 1,000-scenario test set. Jaccard means and ranges use their
+ten within-group pairs; ``Certified'' counts placements whose sampled
+optimization reached the relative MIP gap $10^{-3}$, out of five.
+All five feasible placements enter each row.}
+\label{tab:new20-oos-stability}
+\input{tables/new20_oos_stability}
+\end{table}
 
-The target consolidated file displaces or truncates the placement
-and evaluation fields, and its original worker solutions and source
-scenario graphs are unavailable. Neither the selected original cell
-sets nor their 1,000 scenario-level test losses can be independently
-verified. An aggregate CVaR field cannot supply all three test
-objectives. Therefore the mean and sample standard deviation of the
-OOS objective for each of the 27 objective--budget--size combinations,
-and the ten pairwise Jaccard similarities of each five-solution group,
-cannot be estimated from these records. We do not report a partial
-five-replication table selected by certification status or infer
-stability at $n=400$.
+The mean held-out objective generally improves as $n$ increases, with
+smaller gains from 200 to 400 than from 100 to 200 scenarios. At
+$\alpha=0.02$, expected loss falls from 94.95 to 91.87 and 91.73
+burned cells; CVaR falls from 204.00 to 194.03 and 192.76; and
+mean--CVaR falls from 155.42 to 144.22 and 143.44. The five-sample
+SD also contracts in these three blocks, respectively from 2.99 to
+1.24, 3.58 to 3.06, and 4.89 to 1.40 between $n=100$ and 400.
+Nevertheless, improvement is not uniform: at $\alpha=0.01$ the
+mean--CVaR value rises from 202.17 at $n=200$ to 203.26 at
+$n=400$. These patterns compare independent training samples with a
+common test set, rather than paired increasing samples.
+
+Firebreak sets need not become identical as the held-out objectives
+converge. At $\alpha=0.01$, mean expected-loss Jaccard similarity
+increases from 0.25 at $n=100$ to 0.51 at $n=400$, but for CVaR at
+$\alpha=0.02$ it is 0.08, 0.27 and 0.22 at the three sizes.
+The certification column limits the interpretation of risk-objective
+trends: at $(\alpha,n)=(0.03,400)$ only 1/5 mean--CVaR and 0/5 CVaR
+placements attain the requested tolerance. Their test outcomes
+describe the feasible decisions found under the stopping rule; solver
+error can contribute to both the OOS dispersion and Jaccard variation.
 
 \FloatBarrier
 \subsection{Fidelity of the reduced propagation graph}\label{sec:graph-fidelity}
@@ -155,13 +160,10 @@ $(\alpha,n,\text{replication},\text{objective},s,Y)$; they require no
 Reburn optimization. The normalized difference accounts for distinct
 no-treatment fire severity on the two graph representations.
 
-The manifest verifies common test ID lists for reduced and Reburn
-cases, but it cannot establish identical cell mappings, ignition
-realizations, weights, or arc inclusion. The source scenario graphs
-and the original solution files are absent. No scenario-level paired
-loss or no-treatment baseline for these exact target pairs is
-recoverable. Hence neither the transfer difference nor $\Delta P$
-can be calculated. Proposition~\ref{prop:reduction} is conditional
-on its graph-pair premises and is not used to assert empirical
-monotonicity here. The independently optimized Reburn records do not
-answer the fixed-placement question.
+The available Reburn results optimize a separate placement on that
+representation. They do not evaluate the \emph{same} placement on
+matched reduced and full scenarios, so the transfer difference and
+$\Delta P$ remain outside the present comparison. In particular,
+Proposition~\ref{prop:reduction} applies only when its graph-pair
+premises hold; the reduced-graph OOS results in
+Table~\ref{tab:new20-oos-stability} do not test those premises.

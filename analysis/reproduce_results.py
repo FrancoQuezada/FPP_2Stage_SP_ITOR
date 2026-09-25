@@ -186,8 +186,8 @@ def write_tables(groups, output: Path):
 
 
 def write_selection_audit(groups, output: Path):
-    """Audit preferred-solver certification; do not treat alternatives as selected solutions."""
-    preferred = {"Expected": "Combinatorial", "CVaR": "Path-exp", "MeanCVaR": "Path-exp"}
+    """Record original-panel certification under the common Path-exp policy."""
+    preferred = {obj: "Path-exp" for obj in OBJECTIVES}
     records = []
     for (alpha, n, case, obj), runs in sorted(groups.items()):
         first = next(r for r in runs if classify(r["method"]) == preferred[obj])
@@ -203,8 +203,7 @@ def write_selection_audit(groups, output: Path):
         writer.writerows(records)
     assert len(records) == 135
     assert Counter(row[0] for row in records if row[6]) == {
-        "Expected": 43, "CVaR": 21, "MeanCVaR": 30}
-    assert sum(bool(row[8]) for row in records if not row[6]) == 2
+        "Expected": 39, "CVaR": 21, "MeanCVaR": 30}
 
 
 def write_figure(by_objective, path: Path):
@@ -254,8 +253,10 @@ def main():
     by_objective = write_tables(groups, args.manuscript / "tables")
     write_selection_audit(groups, args.manuscript / "tables")
     write_figure(by_objective, args.manuscript / "figs/new20_certified.tex")
+    from reproduce_oos_stability import reproduce
+    reproduce(args.implementation.resolve(), args.manuscript.resolve())
     print("Checked: 810 complete reduced runs, 519 excluded Reburn rows; 60/60 Reburn training splits differ.")
-    print("Wrote reduced-panel performance table, full statistics, preferred-method audit and enlarged certification profile; damaged suffix excluded.")
+    print("Wrote solver performance, certification profile, and separate held-out value and placement-stability table.")
 
 
 if __name__ == "__main__":

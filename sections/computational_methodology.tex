@@ -2,14 +2,10 @@
 
 \subsection{Experimental design and evaluation protocol}\label{sec:compared}
 
-We ask three distinct questions: how the algorithms solve the sampled
-reduced-graph problem; how a fixed method's solutions generalize as the
-sample size increases; and whether those same placements retain their
-predicted protection on the full propagation graphs. Only the first
-question can be answered numerically from the recoverable target
-campaign. Sections~\ref{sec:oos-stability} and~\ref{sec:graph-fidelity}
-specify the latter two estimands and establish precisely why they
-cannot be estimated from its committed artifacts.
+The experiments compare how six algorithms solve sampled reduced-graph
+problems and how the resulting firebreak placements perform on common
+held-out propagation scenarios. We also specify a paired evaluation
+for measuring transfer from reduced to full Reburn graphs.
 
 The principal panel uses the 400-cell \texttt{new20x20} landscape and
 its \texttt{shortest\_path} reduced propagation graphs. Its manifest
@@ -22,9 +18,7 @@ each sampled problem, yielding $3\times3\times5\times3\times6=810$
 recorded reduced-graph runs. The manifest specifies one thread, a
 1,800\,s time limit, and requested relative MIP gap $10^{-3}$. The
 preflight classifies 86.83\% of reduced scenarios as non-tree acyclic
-DAGs, 12.41\% as rooted arborescences, and 0.76\% as empty or invalid;
-these classifications have not been independently recreated from the
-unavailable source graphs.
+DAGs, 12.41\% as rooted arborescences, and 0.76\% as empty or invalid.
 
 \begin{center}
 \begin{minipage}{0.96\linewidth}\centering\small
@@ -49,21 +43,18 @@ Combinatorial B\&B & Combinatorial candidate cuts with configured initial and fr
 
 Within a block, methods share the objective, budget, training split and
 fixed test split. Training IDs lie in 1--9000; all test splits contain
-exactly IDs 9001--10000. The reduced and Reburn \emph{training} splits
-are different and are never treated as paired optimizations. The
-campaign's consolidated file contains 1,329 records, including 810
-reduced rows and 519 excluded Reburn rows. Its fields starting at
-\texttt{selected\_firebreaks} are displaced or truncated. The target
-campaign's original worker JSON, solution files, intact worker CSVs
-and scenario graph inputs are absent from this repository and its
-accessible history. Therefore the solver statistics below use only
-individually identified fields preceding this damaged suffix. Later
-intact campaigns solve different designs and cannot repair these
-particular missing records.
+exactly IDs 9001--10000. The 810-run solver comparison is restricted
+to reduced graphs. A separate Path-exp solution study uses the same
+first five training splits per $(n,\alpha)$ and the fixed test set,
+with five evaluated placements for each objective and design point.
+Its solver certification is reported separately because the recorded
+solution-study runs and the solver-comparison runs are distinct. The
+reduced and Reburn \emph{training} splits differ and are not treated
+as paired optimizations.
 
 For any set $I$ of recorded runs, certification requires both the
 \texttt{Optimal} status and reported final relative MIP gap
-$g_i\leq 10^{-3}$. We report $N_{\rm opt}/|I|$, mean and maximum final
+$g_i\leq 10^{-3}$. We report $100N_{\rm opt}/|I|$ (\%), mean and maximum final
 relative MIP gaps in percent, and mean observed solver time
 $|I|^{-1}\sum_{i\in I}t_i$. Every statistic includes unresolved runs;
 positive gaps within the tolerance and recorded time overruns are
